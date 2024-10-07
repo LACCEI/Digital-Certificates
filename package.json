@@ -1,0 +1,29 @@
+{
+  "name": "digital-certificates",
+  "version": "1.0.0",
+  "description": "Backend server for digital certificates generation.",
+  "private": true,
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LACCEI/Digital-Certificates.git"
+  },
+  "keywords": [
+    "digital",
+    "certificates",
+    "automatic",
+    "generation"
+  ],
+  "author": "Rodolfo Andres Rivas Matta",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/LACCEI/Digital-Certificates/issues"
+  },
+  "homepage": "https://github.com/LACCEI/Digital-Certificates#readme",
+  "devDependencies": {
+    "typescript": "^5.6.2"
+  }
+}
