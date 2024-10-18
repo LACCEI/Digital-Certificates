@@ -102,14 +102,14 @@ export type pdf_data = [string, string][];
  * operation.
  **/
 export type PDFGeneratedStatus = {
-  status: PdfGenerationStatusEnum;
+  status: PDFGenerationStatusEnum;
   message: string;
 };
 
 /**
  * Represents the status of a PDF generation operation.
  **/
-export enum PdfGenerationStatusEnum {
+export enum PDFGenerationStatusEnum {
   success,
   missing_template,
   invalid_template,
