@@ -8,6 +8,7 @@
     "tsc": "tsc",
     "start": "node dist/index.js",
     "test": "jest",
+    "docs": "jsdoc -c jsdoc.config.json && http-server ./out -p 8080",
     "lintcheck": "prettier --check src/**/*.ts test/**/*.ts",
     "prettier": "prettier --write src/**/*.ts test/**/*.ts"
   },
@@ -29,7 +30,10 @@
   "homepage": "https://github.com/LACCEI/Digital-Certificates#readme",
   "devDependencies": {
     "@types/jest": "^29.5.13",
+    "better-docs": "^2.7.3",
+    "http-server": "^14.1.1",
     "jest": "^29.7.0",
+    "jsdoc": "^4.0.3",
     "prettier": "3.3.3",
     "ts-jest": "^29.2.5",
     "typescript": "^5.6.2"
