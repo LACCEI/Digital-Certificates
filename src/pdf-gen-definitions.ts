@@ -48,14 +48,16 @@ export interface PDFGenerationInterface {
    * processes a batch of PDFs instead of a single one.
    *
    * Just like `generate_pdf`, if there is an error, the status will indicate
-   * the issue. However, the return value is an array of status objects, one
-   * for each PDF generated.
+   * the issue. The status will be an array of statuses, one for each PDF in 
+   * the batch. However, if the error is related to the template path, the
+   * status will be a single status object (as it affect all PDFs in the
+   * batch).
    *
    * @param data - An array of data objects to be included in the PDFs.
    * @param output - The output file path for the generated PDFs.
    * @see pdf_data
    **/
-  generate_pdfs: (data: pdf_data[], output: string) => PDFGeneratedStatus[];
+  generate_pdfs: (data: pdf_data[], output: string) => PDFGeneratedStatus|PDFGeneratedStatus[];
 }
 
 /**
