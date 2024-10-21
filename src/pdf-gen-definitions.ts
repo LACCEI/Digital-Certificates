@@ -33,8 +33,8 @@ export interface PdfGenerationInterface {
    * Generates a single PDF with the provided data and outputs it to the
    * specified path.
    *
-   * If there the template is missing, it does not exist, or a field is
-   * missing, returned status will indicate the error.
+   * If there the template path is missing, the file does not exist, or a data
+   * field is missing, the returned status will indicate the error.
    *
    * @param data - The data to be included in the PDF.
    * @param output - The output file path for the generated PDF.
@@ -111,9 +111,18 @@ export type PDFGeneratedStatus = {
  **/
 export enum PDFGenerationStatusEnum {
   success,
-  missing_template,
-  invalid_template,
+  missing_template_path,
+  template_does_not_exist,
   missing_field,
   extra_fields,
   unknown_error,
 }
+
+export const PDFGenerationStatusMessages = {
+  [PDFGenerationStatusEnum.success]: "PDF generated successfully.",
+  [PDFGenerationStatusEnum.missing_template_path]: "Template path not set.",
+  [PDFGenerationStatusEnum.template_does_not_exist]: "Template file does not exist.",
+  [PDFGenerationStatusEnum.missing_field]: "Missing field in data.",
+  [PDFGenerationStatusEnum.extra_fields]: "Extra fields in data.",
+  [PDFGenerationStatusEnum.unknown_error]: "Unknown error occurred.",
+};
