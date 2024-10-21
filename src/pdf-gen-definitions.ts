@@ -54,10 +54,10 @@ export interface PDFGenerationInterface {
    * batch).
    *
    * @param data - An array of data objects to be included in the PDFs.
-   * @param output - The output file path for the generated PDFs.
+   * @param output - An array of output file paths for the generated PDFs.
    * @see pdf_data
    **/
-  generate_pdfs: (data: pdf_data[], output: string) => PDFGeneratedStatus|PDFGeneratedStatus[];
+  generate_pdfs: (data: pdf_data[], output: string[]) => PDFGeneratedStatus|PDFGeneratedStatus[];
 }
 
 /**
