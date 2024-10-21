@@ -32,7 +32,7 @@ export interface PDFGenerationInterface {
   /**
    * Generates a single PDF with the provided data and outputs it to the
    * specified path.
-   * 
+   *
    * If a file exists in the output path, it will be overwritten.
    *
    * If there the template path is missing, the file does not exist, or a data
@@ -48,11 +48,11 @@ export interface PDFGenerationInterface {
    * Generates multiple PDFs with the provided data array and outputs them to
    * the specified path. This function is similar to `generate_pdf`, but it
    * processes a batch of PDFs instead of a single one.
-   * 
+   *
    * If a file exists in the output path, it will be overwritten.
    *
    * Just like `generate_pdf`, if there is an error, the status will indicate
-   * the issue. The status will be an array of statuses, one for each PDF in 
+   * the issue. The status will be an array of statuses, one for each PDF in
    * the batch. However, if the error is related to the template path, the
    * status will be a single status object (as it affect all PDFs in the
    * batch).
@@ -61,7 +61,10 @@ export interface PDFGenerationInterface {
    * @param output - An array of output file paths for the generated PDFs.
    * @see pdf_data
    **/
-  generate_pdfs: (data: pdf_data[], output: string[]) => PDFGeneratedStatus|PDFGeneratedStatus[];
+  generate_pdfs: (
+    data: pdf_data[],
+    output: string[],
+  ) => PDFGeneratedStatus | PDFGeneratedStatus[];
 }
 
 /**
