@@ -57,6 +57,8 @@ describe("PDFGeneration - Working with one document", () => {
       `${dirs.output}/${output}`,
     );
 
+    pdfGen.set_template(`${dirs.templates}/does-not-exist.docx`);
+
     expect(status.status).toEqual(
       PDFGenerationStatusEnum.missing_template_path,
     );
@@ -188,23 +190,16 @@ describe("PDFGeneration - Working with one document", () => {
   });
 });
 
-/*  it("should generate a PDF using constants", () => {
-  const data = [
-    ["date", "2023-10-01"],
-    ["course", "Introduction to TypeScript"],
-  ];
-  const output = "output.pdf";
-  const constants = [
-    ["name", "John Doe"],
-  ];
-  pdfGen.set_constants(constants);
-  const status = pdfGen.generate_pdf(data, output);
-  expect(status.status).toEqual("success");
-  expect(status.message).toEqual("PDF generated successfully.");
-});
+describe("PDFGeneration - Working with multiple documents", () => {
+  let pdfGen: PDFGeneration;
 
-it("should generate PDFs", () => {
-  const data = [
+  const dirs = {
+    templates: "templates",
+    output: "output",
+    expected: "expected",
+  };
+
+  const multipleDataSample: pdf_data[] = [
     [
       ["name", "John Doe"],
       ["date", "2023-10-01"],
@@ -216,8 +211,167 @@ it("should generate PDFs", () => {
       ["course", "Advanced TypeScript"],
     ],
   ];
-  const output = "output.pdf";
-  const status = pdfGen.generate_pdfs(data, output);
-  expect(status.status).toEqual("success");
-  expect(status.message).toEqual("PDFs generated successfully.");
-}); */
+
+  beforeEach(() => {
+    pdfGen = new PDFGeneration();
+  });
+
+  it("should return a missing template path error", () => {
+    const output = "test-multiple-output1.pdf";
+    const status = pdfGen.generate_pdfs(multipleDataSample, [
+      `${dirs.output}/${output}`,
+    ]);
+
+    if (!Array.isArray(status)) {
+      expect(status.status).toEqual(
+        PDFGenerationStatusEnum.missing_template_path,
+      );
+      expect(status.message).toEqual(
+        PDFGenerationStatusMessages[
+          PDFGenerationStatusEnum.missing_template_path
+        ],
+      );
+    } else {
+      fail("An array was returned. Expected a single status.");
+    }
+  });
+
+  it("should return missing template file error", () => {
+    const output = "test-multiple-output1.pdf";
+
+    pdfGen.set_template(`${dirs.templates}/does-not-exist.docx`);
+    const status = pdfGen.generate_pdfs(multipleDataSample, [
+      `${dirs.output}/${output}`,
+    ]);
+
+    if (!Array.isArray(status)) {
+      expect(status.status).toEqual(
+        PDFGenerationStatusEnum.missing_template_path,
+      );
+      expect(status.message).toEqual(
+        PDFGenerationStatusMessages[
+          PDFGenerationStatusEnum.missing_template_path
+        ],
+      );
+    } else {
+      fail("An array was returned. Expected a single status.");
+    }
+  });
+
+  it("should return a missing field error", () => {
+    const data: pdf_data[] = [
+      ...multipleDataSample,
+      [
+        ["name", "John Doe"],
+        ["date", "2023-10-01"],
+      ],
+    ];
+
+    const files = {
+      template: `${dirs.templates}/test-template1.docx`,
+      output: data.map(
+        (_, i) => `${dirs.output}/test-multiple-output1-${i}.pdf`,
+      ),
+    };
+
+    pdfGen.set_template(files.template);
+    const status = pdfGen.generate_pdfs(data, files.output);
+
+    const expected_outputs = [
+      PDFGenerationStatusEnum.success,
+      PDFGenerationStatusEnum.success,
+      PDFGenerationStatusEnum.missing_field,
+    ];
+
+    const expected_messages = [
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.missing_field],
+    ];
+
+    if (Array.isArray(status) && status.length === 3) {
+      status.forEach((s, i) => {
+        expect(s.status).toEqual(expected_outputs[i]);
+        expect(s.message).toEqual(expected_messages[i]);
+      });
+    } else {
+      fail("Expected an array of statuses of length 3.");
+    }
+  });
+
+  it("should return extra fields error", () => {
+    const files = {
+      template: `${dirs.templates}/test-template1.docx`,
+      output: multipleDataSample.map(
+        (_, i) => `${dirs.output}/test-multiple-output2-${i}.pdf`,
+      ),
+    };
+
+    const data: pdf_data[] = [
+      ...multipleDataSample,
+      [
+        ["name", "John Doe"],
+        ["date", "2023-10-01"],
+        ["course", "Introduction to TypeScript"],
+        ["extra", "Extra field"],
+      ],
+    ];
+
+    pdfGen.set_template(files.template);
+    const status = pdfGen.generate_pdfs(data, files.output);
+
+    const expected_outputs = [
+      PDFGenerationStatusEnum.success,
+      PDFGenerationStatusEnum.success,
+      PDFGenerationStatusEnum.extra_fields,
+    ];
+
+    const expected_messages = [
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.extra_fields],
+    ];
+
+    if (Array.isArray(status) && status.length === 3) {
+      status.forEach((s, i) => {
+        expect(s.status).toEqual(expected_outputs[i]);
+        expect(s.message).toEqual(expected_messages[i]);
+      });
+    } else {
+      fail("Expected an array of statuses of length 3.");
+    }
+  });
+
+  it("should generate PDFs", () => {
+    const files = {
+      template: `${dirs.templates}/test-template1.docx`,
+      // expected: `${dirs.expected}/test-template1.pdf`,
+      output: multipleDataSample.map(
+        (_, i) => `${dirs.output}/test-multiple-output3-${i}.pdf`,
+      ),
+    };
+
+    pdfGen.set_template(files.template);
+    const status = pdfGen.generate_pdfs(multipleDataSample, files.output);
+
+    const expected_outputs = [
+      PDFGenerationStatusEnum.success,
+      PDFGenerationStatusEnum.success,
+    ];
+
+    const expected_messages = [
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
+    ];
+
+    if (Array.isArray(status) && status.length === 2) {
+      status.forEach((s, i) => {
+        expect(s.status).toEqual(expected_outputs[i]);
+        expect(s.message).toEqual(expected_messages[i]);
+        // expect(compareFiles(files.output[i], files.expected)).toBeTruthy();
+      });
+    } else {
+      fail("Expected an array of statuses of length 2.");
+    }
+  });
+});
