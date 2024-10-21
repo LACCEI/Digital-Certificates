@@ -33,9 +33,9 @@ describe("PDFGeneration - Working with one document", () => {
     pdfGen = new PDFGeneration();
   });
 
-  it("should return a missing template path error", () => {
+  it("should return a missing template path error", async () => {
     const output = "test-template1.pdf";
-    const status = pdfGen.generate_pdf(
+    const status = await pdfGen.generate_pdf(
       singleDataSample,
       `${dirs.output}/${output}`,
     );
@@ -50,14 +50,14 @@ describe("PDFGeneration - Working with one document", () => {
     );
   });
 
-  it("should return missing template file error", () => {
+  it("should return missing template file error", async () => {
     const output = "test-template1.pdf";
-    const status = pdfGen.generate_pdf(
-      singleDataSample,
-      `${dirs.output}/${output}`,
-    );
-
+    
     pdfGen.set_template(`${dirs.templates}/does-not-exist.docx`);
+    const status = await pdfGen.generate_pdf(
+      singleDataSample,
+      `${dirs.output}/${output}`,
+    );
 
     expect(status.status).toEqual(
       PDFGenerationStatusEnum.missing_template_path,
@@ -69,7 +69,7 @@ describe("PDFGeneration - Working with one document", () => {
     );
   });
 
-  it("should return missing field error", () => {
+  it("should return missing field error", async () => {
     const files = {
       template: `${dirs.templates}/test-template1.docx`,
       output: `${dirs.output}/test-template1.pdf`,
@@ -81,7 +81,7 @@ describe("PDFGeneration - Working with one document", () => {
     ];
 
     pdfGen.set_template(files.template);
-    const status: PDFGeneratedStatus = pdfGen.generate_pdf(data, files.output);
+    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(data, files.output);
 
     expect(status.status).toEqual(PDFGenerationStatusEnum.missing_field);
     expect(status.message).toEqual(
@@ -89,7 +89,7 @@ describe("PDFGeneration - Working with one document", () => {
     );
   });
 
-  it("should return extra fields error", () => {
+  it("should return extra fields error", async () => {
     const files = {
       template: `${dirs.templates}/test-template1.docx`,
       output: `${dirs.output}/test-template1.pdf`,
@@ -103,7 +103,7 @@ describe("PDFGeneration - Working with one document", () => {
     ];
 
     pdfGen.set_template(files.template);
-    const status: PDFGeneratedStatus = pdfGen.generate_pdf(data, files.output);
+    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(data, files.output);
 
     expect(status.status).toEqual(PDFGenerationStatusEnum.extra_fields);
     expect(status.message).toEqual(
@@ -111,7 +111,7 @@ describe("PDFGeneration - Working with one document", () => {
     );
   });
 
-  it("should generate a PDF using default config", () => {
+  it("should generate a PDF using default config", async () => {
     const files = {
       template: `${dirs.templates}/test-template1.docx`,
       expected: `${dirs.expected}/test-template1.pdf`,
@@ -119,7 +119,7 @@ describe("PDFGeneration - Working with one document", () => {
     };
 
     pdfGen.set_template(files.template);
-    const status: PDFGeneratedStatus = pdfGen.generate_pdf(
+    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(
       singleDataSample,
       `${dirs.output}/test-template1.pdf`,
     );
@@ -131,7 +131,7 @@ describe("PDFGeneration - Working with one document", () => {
     expect(compareFiles(files.output, files.expected)).toBeTruthy();
   });
 
-  it("should generate a PDF using constants using default config", () => {
+  it("should generate a PDF using constants using default config", async () => {
     const files = {
       template: `${dirs.templates}/test-template1.docx`,
       expected: `${dirs.expected}/test-template1.pdf`,
@@ -148,7 +148,7 @@ describe("PDFGeneration - Working with one document", () => {
     pdfGen.set_template(files.template);
     pdfGen.set_constants(constants);
 
-    const status: PDFGeneratedStatus = pdfGen.generate_pdf(data, files.output);
+    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(data, files.output);
 
     expect(status.status).toEqual(PDFGenerationStatusEnum.success);
     expect(status.message).toEqual(
@@ -157,7 +157,7 @@ describe("PDFGeneration - Working with one document", () => {
     expect(compareFiles(files.output, files.expected)).toBeTruthy();
   });
 
-  it("should generate a PDF using configuration", () => {
+  it("should generate a PDF using configuration", async () => {
     const files = {
       template: `${dirs.templates}/test-template2.docx`,
       expected: `${dirs.expected}/test-template1.pdf`,
@@ -180,7 +180,7 @@ describe("PDFGeneration - Working with one document", () => {
     pdfGen.set_template(files.template);
     pdfGen.set_proc_config(config);
 
-    const status: PDFGeneratedStatus = pdfGen.generate_pdf(data, files.output);
+    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(data, files.output);
 
     expect(status.status).toEqual(PDFGenerationStatusEnum.success);
     expect(status.message).toEqual(
@@ -216,9 +216,9 @@ describe("PDFGeneration - Working with multiple documents", () => {
     pdfGen = new PDFGeneration();
   });
 
-  it("should return a missing template path error", () => {
+  it("should return a missing template path error", async () => {
     const output = "test-multiple-output1.pdf";
-    const status = pdfGen.generate_pdfs(multipleDataSample, [
+    const status = await pdfGen.generate_pdfs(multipleDataSample, [
       `${dirs.output}/${output}`,
     ]);
 
@@ -236,11 +236,11 @@ describe("PDFGeneration - Working with multiple documents", () => {
     }
   });
 
-  it("should return missing template file error", () => {
+  it("should return missing template file error", async () => {
     const output = "test-multiple-output1.pdf";
 
     pdfGen.set_template(`${dirs.templates}/does-not-exist.docx`);
-    const status = pdfGen.generate_pdfs(multipleDataSample, [
+    const status = await pdfGen.generate_pdfs(multipleDataSample, [
       `${dirs.output}/${output}`,
     ]);
 
@@ -258,7 +258,7 @@ describe("PDFGeneration - Working with multiple documents", () => {
     }
   });
 
-  it("should return a missing field error", () => {
+  it("should return a missing field error", async () => {
     const data: pdf_data[] = [
       ...multipleDataSample,
       [
@@ -275,7 +275,7 @@ describe("PDFGeneration - Working with multiple documents", () => {
     };
 
     pdfGen.set_template(files.template);
-    const status = pdfGen.generate_pdfs(data, files.output);
+    const status = await pdfGen.generate_pdfs(data, files.output);
 
     const expected_outputs = [
       PDFGenerationStatusEnum.success,
@@ -299,7 +299,7 @@ describe("PDFGeneration - Working with multiple documents", () => {
     }
   });
 
-  it("should return extra fields error", () => {
+  it("should return extra fields error", async () => {
     const files = {
       template: `${dirs.templates}/test-template1.docx`,
       output: multipleDataSample.map(
@@ -318,7 +318,7 @@ describe("PDFGeneration - Working with multiple documents", () => {
     ];
 
     pdfGen.set_template(files.template);
-    const status = pdfGen.generate_pdfs(data, files.output);
+    const status = await pdfGen.generate_pdfs(data, files.output);
 
     const expected_outputs = [
       PDFGenerationStatusEnum.success,
@@ -342,7 +342,7 @@ describe("PDFGeneration - Working with multiple documents", () => {
     }
   });
 
-  it("should generate PDFs", () => {
+  it("should generate PDFs", async () => {
     const files = {
       template: `${dirs.templates}/test-template1.docx`,
       // expected: `${dirs.expected}/test-template1.pdf`,
@@ -352,7 +352,7 @@ describe("PDFGeneration - Working with multiple documents", () => {
     };
 
     pdfGen.set_template(files.template);
-    const status = pdfGen.generate_pdfs(multipleDataSample, files.output);
+    const status = await pdfGen.generate_pdfs(multipleDataSample, files.output);
 
     const expected_outputs = [
       PDFGenerationStatusEnum.success,
