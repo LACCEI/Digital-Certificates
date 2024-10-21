@@ -1,7 +1,7 @@
 /**
  * Interface for the PDF generation object.
  **/
-export interface PdfGenerationInterface {
+export interface PDFGenerationInterface {
   /**
    * Sets the template for the PDF generation.
    *
@@ -121,7 +121,8 @@ export enum PDFGenerationStatusEnum {
 export const PDFGenerationStatusMessages = {
   [PDFGenerationStatusEnum.success]: "PDF generated successfully.",
   [PDFGenerationStatusEnum.missing_template_path]: "Template path not set.",
-  [PDFGenerationStatusEnum.template_does_not_exist]: "Template file does not exist.",
+  [PDFGenerationStatusEnum.template_does_not_exist]:
+    "Template file does not exist.",
   [PDFGenerationStatusEnum.missing_field]: "Missing field in data.",
   [PDFGenerationStatusEnum.extra_fields]: "Extra fields in data.",
   [PDFGenerationStatusEnum.unknown_error]: "Unknown error occurred.",
