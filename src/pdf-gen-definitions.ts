@@ -65,7 +65,7 @@ export type proc_config = {
   /**
    * Delimiters used in the processing.
    **/
-  delimters: {
+  delimiters: {
     /**
      * The starting delimiter.
      **/
