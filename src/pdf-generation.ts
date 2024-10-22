@@ -8,11 +8,10 @@ import {
 } from "./pdf-gen-definitions";
 import path from "path";
 import fs from "fs";
-import createReport from "docx-templates";
+import { createReport, getMetadata, listCommands } from "docx-templates";
 import libre from "libreoffice-convert";
-import util from "util";
 
-const libreConvertAsync = require('util').promisify(libre.convert);
+const libreConvertAsync = require("util").promisify(libre.convert);
 
 export default class PDFGeneration implements PDFGenerationInterface {
   private config: { cmdDelimiter: [string, string] } = {
@@ -40,15 +39,28 @@ export default class PDFGeneration implements PDFGenerationInterface {
 
   set_proc_config(config: proc_config): void {
     this.config = {
-      cmdDelimiter: [
-        config.delimiters.start,
-        config.delimiters.end,
-      ],
+      cmdDelimiter: [config.delimiters.start, config.delimiters.end],
     };
   }
 
   set_constants(constants: pdf_data): void {
     this.constants = constants;
+  }
+
+  private async list_placeholders(template: Buffer): Promise<string[]> {
+    const commands = await listCommands(template, this.config.cmdDelimiter);
+    const placeholders = Array.from(new Set(commands.map((command) => command.code)));
+    return placeholders;
+  }
+
+  private is_missing_placeholders(placeholders: string[], data: pdf_data): boolean {
+    const dataKeys = data.map(([key]) => key);
+    return placeholders.some((placeholder) => !dataKeys.includes(placeholder));
+  }
+
+  private has_extra_placeholders(placeholders: string[], data: pdf_data): boolean {
+    const dataKeys = data.map(([key]) => key);
+    return dataKeys.some((key) => !placeholders.includes(key));
   }
 
   /**
@@ -95,6 +107,21 @@ export default class PDFGeneration implements PDFGenerationInterface {
     }
 
     const template_buffer = fs.readFileSync(this.template_file_path);
+
+    const placeholders = await this.list_placeholders(template_buffer);
+
+    if (this.is_missing_placeholders(placeholders, instance_data)) {
+      return {
+        status: PDFGenerationStatusEnum.missing_fields,
+        message: PDFGenerationStatusMessages[PDFGenerationStatusEnum.missing_fields],
+      };
+    } else if (this.has_extra_placeholders(placeholders, instance_data)) {
+      return {
+        status: PDFGenerationStatusEnum.extra_fields,
+        message: PDFGenerationStatusMessages[PDFGenerationStatusEnum.extra_fields],
+      };
+    }
+    
 
     try {
       const docxBuffer = await createReport({
