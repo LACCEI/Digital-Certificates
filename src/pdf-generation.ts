@@ -6,16 +6,17 @@ import {
   PDFGenerationStatusEnum,
   PDFGenerationStatusMessages,
 } from "./pdf-gen-definitions";
-import PSPDFKit from "pspdfkit";
 import path from "path";
 import fs from "fs";
+import createReport from "docx-templates";
+import libre from "libreoffice-convert";
+import util from "util";
+
+const libreConvertAsync = require('util').promisify(libre.convert);
 
 export default class PDFGeneration implements PDFGenerationInterface {
-  private pspdfkit_config = {
-    delimiter: {
-      start: "{{",
-      end: "}}",
-    },
+  private config: { cmdDelimiter: [string, string] } = {
+    cmdDelimiter: ["{{", "}}"],
   };
 
   private template_file_path: string = "";
@@ -38,11 +39,11 @@ export default class PDFGeneration implements PDFGenerationInterface {
   }
 
   set_proc_config(config: proc_config): void {
-    this.pspdfkit_config = {
-      delimiter: {
-        start: config.delimiters.start,
-        end: config.delimiters.end,
-      },
+    this.config = {
+      cmdDelimiter: [
+        config.delimiters.start,
+        config.delimiters.end,
+      ],
     };
   }
 
@@ -56,7 +57,7 @@ export default class PDFGeneration implements PDFGenerationInterface {
    *
    * @param data - The data to be included in the PDF.
    **/
-  private build_model(data: pdf_data): Array<Record<string, unknown>> {
+  private build_model(data: pdf_data): Record<string, unknown> {
     const model: Record<string, unknown> = {};
 
     this.constants.forEach(([key, value]) => {
@@ -68,26 +69,14 @@ export default class PDFGeneration implements PDFGenerationInterface {
       model[key as string] = value;
     });
 
-    return [model];
-  }
-
-  private write_pdf_to_file(pdfBuffer: Buffer, output: string): void {
-    fs.writeFileSync(output, pdfBuffer);
+    return model;
   }
 
   async generate_pdf(
     instance_data: pdf_data,
     output: string,
   ): Promise<PDFGeneratedStatus> {
-    if (!this.does_the_template_exist(this.template_file_path)) {
-      return Promise.resolve({
-        status: PDFGenerationStatusEnum.template_does_not_exist,
-        message:
-          PDFGenerationStatusMessages[
-            PDFGenerationStatusEnum.template_does_not_exist
-          ],
-      });
-    } else if (this.template_file_path === "") {
+    if (this.template_file_path === "") {
       return Promise.resolve({
         status: PDFGenerationStatusEnum.missing_template_path,
         message:
@@ -95,33 +84,28 @@ export default class PDFGeneration implements PDFGenerationInterface {
             PDFGenerationStatusEnum.missing_template_path
           ],
       });
+    } else if (!this.does_the_template_exist(this.template_file_path)) {
+      return Promise.resolve({
+        status: PDFGenerationStatusEnum.template_does_not_exist,
+        message:
+          PDFGenerationStatusMessages[
+            PDFGenerationStatusEnum.template_does_not_exist
+          ],
+      });
     }
 
-    const data = {
-      config: {
-        ...this.pspdfkit_config,
-      },
-      model: this.build_model(instance_data),
-    };
+    const template_buffer = fs.readFileSync(this.template_file_path);
 
     try {
-      const buffer = await PSPDFKit.populateDocumentTemplate(
-        {
-          document: this.template_file_path,
-          container: "",
-        },
-        data,
-      );
+      const docxBuffer = await createReport({
+        cmdDelimiter: this.config.cmdDelimiter,
+        template: template_buffer,
+        data: this.build_model(instance_data),
+      });
 
-      const pdfBuffer = await PSPDFKit.convertToPDF(
-        {
-          document: buffer,
-          container: "",
-        },
-        PSPDFKit.Conformance.PDFA_1A,
-      );
+      let PDFBuffer = await libreConvertAsync(docxBuffer, ".pdf", undefined);
 
-      this.write_pdf_to_file(Buffer.from(pdfBuffer), output);
+      fs.writeFileSync(output, PDFBuffer);
 
       return {
         status: PDFGenerationStatusEnum.success,
