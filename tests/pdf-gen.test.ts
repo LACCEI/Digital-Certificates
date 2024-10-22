@@ -18,9 +18,9 @@ describe("PDFGeneration - Working with one document", () => {
   let pdfGen: PDFGeneration;
 
   const dirs = {
-    templates: "templates",
-    output: "output",
-    expected: "expected",
+    templates: "../tests/templates",
+    output: "../tests/output",
+    expected: "../tests/expected",
   };
 
   const singleDataSample: pdf_data = [
@@ -206,9 +206,9 @@ describe("PDFGeneration - Working with multiple documents", () => {
   let pdfGen: PDFGeneration;
 
   const dirs = {
-    templates: "templates",
-    output: "output",
-    expected: "expected",
+    templates: "../tests/templates",
+    output: "../tests/output",
+    expected: "../tests/expected",
   };
 
   const multipleDataSample: pdf_data[] = [
