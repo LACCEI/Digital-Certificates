@@ -57,17 +57,17 @@ export default class PDFGeneration implements PDFGenerationInterface {
 
   private is_missing_placeholders(
     placeholders: string[],
-    data: pdf_data,
+    data: Record<string, unknown>,
   ): boolean {
-    const dataKeys = data.map(([key]) => key);
+    const dataKeys = Object.keys(data);
     return placeholders.some((placeholder) => !dataKeys.includes(placeholder));
   }
 
   private has_extra_placeholders(
     placeholders: string[],
-    data: pdf_data,
+    data: Record<string, unknown>,
   ): boolean {
-    const dataKeys = data.map(([key]) => key);
+    const dataKeys = Object.keys(data);
     return dataKeys.some((key) => !placeholders.includes(key));
   }
 
@@ -117,14 +117,15 @@ export default class PDFGeneration implements PDFGenerationInterface {
     const template_buffer = fs.readFileSync(this.template_file_path);
 
     const placeholders = await this.list_placeholders(template_buffer);
+    const model = this.build_model(instance_data);
 
-    if (this.is_missing_placeholders(placeholders, instance_data)) {
+    if (this.is_missing_placeholders(placeholders, model)) {
       return {
         status: PDFGenerationStatusEnum.missing_fields,
         message:
           PDFGenerationStatusMessages[PDFGenerationStatusEnum.missing_fields],
       };
-    } else if (this.has_extra_placeholders(placeholders, instance_data)) {
+    } else if (this.has_extra_placeholders(placeholders, model)) {
       return {
         status: PDFGenerationStatusEnum.extra_fields,
         message:
@@ -136,12 +137,15 @@ export default class PDFGeneration implements PDFGenerationInterface {
       const docxBuffer = await createReport({
         cmdDelimiter: this.config.cmdDelimiter,
         template: template_buffer,
-        data: this.build_model(instance_data),
+        data: model,
       });
 
       let PDFBuffer = await libreConvertAsync(docxBuffer, ".pdf", undefined);
 
-      fs.writeFileSync(output, PDFBuffer);
+      const output_path = this.get_absolute_path(output);
+      fs.writeFileSync(output_path, PDFBuffer, {
+        flag: "w",
+      });
 
       return {
         status: PDFGenerationStatusEnum.success,
