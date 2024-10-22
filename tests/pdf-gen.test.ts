@@ -147,7 +147,7 @@ describe("PDFGeneration - Working with one document", () => {
     // expect(compareFiles(files.output, files.expected)).toBeTruthy();
   });
 
-  it("should generate a PDF using constants using default config", async () => {
+  it("should generate a PDF using constants", async () => {
     const files = {
       template: `${dirs.templates}/test-template1.docx`,
       // expected: `${dirs.expected}/test-template1.pdf`,
@@ -176,7 +176,7 @@ describe("PDFGeneration - Working with one document", () => {
     // expect(compareFiles(files.output, files.expected)).toBeTruthy();
   });
 
-  it("should generate a PDF using configuration", async () => {
+  it("should generate a PDF using custom configuration", async () => {
     const files = {
       template: `${dirs.templates}/test-template2.docx`,
       // expected: `${dirs.expected}/test-template1.pdf`,
