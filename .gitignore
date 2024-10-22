@@ -1,6 +1,9 @@
 # Generated output.
 out/
 
+# Output from tests.
+/tests/output/*
+
 # Logs
 logs
 *.log
