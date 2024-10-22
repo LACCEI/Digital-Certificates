@@ -49,16 +49,24 @@ export default class PDFGeneration implements PDFGenerationInterface {
 
   private async list_placeholders(template: Buffer): Promise<string[]> {
     const commands = await listCommands(template, this.config.cmdDelimiter);
-    const placeholders = Array.from(new Set(commands.map((command) => command.code)));
+    const placeholders = Array.from(
+      new Set(commands.map((command) => command.code)),
+    );
     return placeholders;
   }
 
-  private is_missing_placeholders(placeholders: string[], data: pdf_data): boolean {
+  private is_missing_placeholders(
+    placeholders: string[],
+    data: pdf_data,
+  ): boolean {
     const dataKeys = data.map(([key]) => key);
     return placeholders.some((placeholder) => !dataKeys.includes(placeholder));
   }
 
-  private has_extra_placeholders(placeholders: string[], data: pdf_data): boolean {
+  private has_extra_placeholders(
+    placeholders: string[],
+    data: pdf_data,
+  ): boolean {
     const dataKeys = data.map(([key]) => key);
     return dataKeys.some((key) => !placeholders.includes(key));
   }
@@ -113,15 +121,16 @@ export default class PDFGeneration implements PDFGenerationInterface {
     if (this.is_missing_placeholders(placeholders, instance_data)) {
       return {
         status: PDFGenerationStatusEnum.missing_fields,
-        message: PDFGenerationStatusMessages[PDFGenerationStatusEnum.missing_fields],
+        message:
+          PDFGenerationStatusMessages[PDFGenerationStatusEnum.missing_fields],
       };
     } else if (this.has_extra_placeholders(placeholders, instance_data)) {
       return {
         status: PDFGenerationStatusEnum.extra_fields,
-        message: PDFGenerationStatusMessages[PDFGenerationStatusEnum.extra_fields],
+        message:
+          PDFGenerationStatusMessages[PDFGenerationStatusEnum.extra_fields],
       };
     }
-    
 
     try {
       const docxBuffer = await createReport({
