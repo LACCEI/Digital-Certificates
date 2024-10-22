@@ -60,11 +60,11 @@ describe("PDFGeneration - Working with one document", () => {
     );
 
     expect(status.status).toEqual(
-      PDFGenerationStatusEnum.missing_template_path,
+      PDFGenerationStatusEnum.template_does_not_exist,
     );
     expect(status.message).toEqual(
       PDFGenerationStatusMessages[
-        PDFGenerationStatusEnum.missing_template_path
+        PDFGenerationStatusEnum.template_does_not_exist
       ],
     );
   });
