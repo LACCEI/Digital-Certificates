@@ -52,7 +52,7 @@ describe("PDFGeneration - Working with one document", () => {
 
   it("should return missing template file error", async () => {
     const output = "test-template1.pdf";
-    
+
     pdfGen.set_template(`${dirs.templates}/does-not-exist.docx`);
     const status = await pdfGen.generate_pdf(
       singleDataSample,
@@ -81,7 +81,10 @@ describe("PDFGeneration - Working with one document", () => {
     ];
 
     pdfGen.set_template(files.template);
-    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(data, files.output);
+    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(
+      data,
+      files.output,
+    );
 
     expect(status.status).toEqual(PDFGenerationStatusEnum.missing_field);
     expect(status.message).toEqual(
@@ -103,7 +106,10 @@ describe("PDFGeneration - Working with one document", () => {
     ];
 
     pdfGen.set_template(files.template);
-    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(data, files.output);
+    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(
+      data,
+      files.output,
+    );
 
     expect(status.status).toEqual(PDFGenerationStatusEnum.extra_fields);
     expect(status.message).toEqual(
@@ -148,7 +154,10 @@ describe("PDFGeneration - Working with one document", () => {
     pdfGen.set_template(files.template);
     pdfGen.set_constants(constants);
 
-    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(data, files.output);
+    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(
+      data,
+      files.output,
+    );
 
     expect(status.status).toEqual(PDFGenerationStatusEnum.success);
     expect(status.message).toEqual(
@@ -180,7 +189,10 @@ describe("PDFGeneration - Working with one document", () => {
     pdfGen.set_template(files.template);
     pdfGen.set_proc_config(config);
 
-    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(data, files.output);
+    const status: PDFGeneratedStatus = await pdfGen.generate_pdf(
+      data,
+      files.output,
+    );
 
     expect(status.status).toEqual(PDFGenerationStatusEnum.success);
     expect(status.message).toEqual(
