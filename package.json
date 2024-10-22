@@ -39,6 +39,7 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "pspdfkit": "^2024.6.0"
+    "docx-templates": "^4.13.0",
+    "libreoffice-convert": "^1.6.0"
   }
 }
