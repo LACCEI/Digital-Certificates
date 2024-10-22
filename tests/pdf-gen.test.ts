@@ -268,11 +268,11 @@ describe("PDFGeneration - Working with multiple documents", () => {
 
     if (!Array.isArray(status)) {
       expect(status.status).toEqual(
-        PDFGenerationStatusEnum.missing_template_path,
+        PDFGenerationStatusEnum.template_does_not_exist,
       );
       expect(status.message).toEqual(
         PDFGenerationStatusMessages[
-          PDFGenerationStatusEnum.missing_template_path
+          PDFGenerationStatusEnum.template_does_not_exist
         ],
       );
     } else {
@@ -292,7 +292,7 @@ describe("PDFGeneration - Working with multiple documents", () => {
     const files = {
       template: `${dirs.templates}/test-template1.docx`,
       output: data.map(
-        (_, i) => `${dirs.output}/test-multiple-output1-${i}.pdf`,
+        (_, i) => `${dirs.output}/test-multiple-output-test1-${i}.pdf`,
       ),
     };
 
@@ -325,7 +325,7 @@ describe("PDFGeneration - Working with multiple documents", () => {
     const files = {
       template: `${dirs.templates}/test-template1.docx`,
       output: multipleDataSample.map(
-        (_, i) => `${dirs.output}/test-multiple-output2-${i}.pdf`,
+        (_, i) => `${dirs.output}/test-multiple-output-test2-${i}.pdf`,
       ),
     };
 
@@ -369,7 +369,7 @@ describe("PDFGeneration - Working with multiple documents", () => {
       template: `${dirs.templates}/test-template1.docx`,
       // expected: `${dirs.expected}/test-template1.pdf`,
       output: multipleDataSample.map(
-        (_, i) => `${dirs.output}/test-multiple-output3-${i}.pdf`,
+        (_, i) => `${dirs.output}/test-multiple-output-test3-${i}.pdf`,
       ),
     };
 
