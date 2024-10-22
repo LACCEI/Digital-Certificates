@@ -92,26 +92,35 @@ export default class PDFGeneration implements PDFGenerationInterface {
     return model;
   }
 
-  async generate_pdf(
-    instance_data: pdf_data,
-    output: string,
-  ): Promise<PDFGeneratedStatus> {
+  private should_fail_due_to_template(): boolean | PDFGeneratedStatus {
     if (this.template_file_path === "") {
-      return Promise.resolve({
+      return {
         status: PDFGenerationStatusEnum.missing_template_path,
         message:
           PDFGenerationStatusMessages[
             PDFGenerationStatusEnum.missing_template_path
           ],
-      });
+      };
     } else if (!this.does_the_template_exist(this.template_file_path)) {
-      return Promise.resolve({
+      return {
         status: PDFGenerationStatusEnum.template_does_not_exist,
         message:
           PDFGenerationStatusMessages[
             PDFGenerationStatusEnum.template_does_not_exist
           ],
-      });
+      };
+    }
+
+    return false;
+  }
+
+  async generate_pdf(
+    instance_data: pdf_data,
+    output: string,
+  ): Promise<PDFGeneratedStatus> {
+    const template_status = this.should_fail_due_to_template();
+    if (template_status) {
+      return Promise.resolve(template_status as PDFGeneratedStatus);
     }
 
     const template_buffer = fs.readFileSync(this.template_file_path);
@@ -163,11 +172,15 @@ export default class PDFGeneration implements PDFGenerationInterface {
     data: pdf_data[],
     output: string[],
   ): Promise<PDFGeneratedStatus | PDFGeneratedStatus[]> {
-    // Implementation here
+    const template_status = this.should_fail_due_to_template();
+    if (template_status) {
+      return Promise.resolve(template_status as PDFGeneratedStatus);
+    }
 
-    return Promise.resolve({
-      status: PDFGenerationStatusEnum.success,
-      message: "PDFs generated successfully.",
+    const promises = data.map((instance_data, index) => {
+      return this.generate_pdf(instance_data, output[index]);
     });
+
+    return Promise.all(promises);
   }
 }
