@@ -123,7 +123,7 @@ export enum PDFGenerationStatusEnum {
   success,
   missing_template_path,
   template_does_not_exist,
-  missing_field,
+  missing_fields,
   extra_fields,
   unknown_error,
 }
@@ -133,7 +133,7 @@ export const PDFGenerationStatusMessages = {
   [PDFGenerationStatusEnum.missing_template_path]: "Template path not set.",
   [PDFGenerationStatusEnum.template_does_not_exist]:
     "Template file does not exist.",
-  [PDFGenerationStatusEnum.missing_field]: "Missing field in data.",
+  [PDFGenerationStatusEnum.missing_fields]: "Missing fields in data.",
   [PDFGenerationStatusEnum.extra_fields]: "Extra fields in data.",
   [PDFGenerationStatusEnum.unknown_error]: "Unknown error occurred.",
 };

@@ -86,9 +86,9 @@ describe("PDFGeneration - Working with one document", () => {
       files.output,
     );
 
-    expect(status.status).toEqual(PDFGenerationStatusEnum.missing_field);
+    expect(status.status).toEqual(PDFGenerationStatusEnum.missing_fields);
     expect(status.message).toEqual(
-      PDFGenerationStatusMessages[PDFGenerationStatusEnum.missing_field],
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.missing_fields],
     );
   });
 
@@ -292,13 +292,13 @@ describe("PDFGeneration - Working with multiple documents", () => {
     const expected_outputs = [
       PDFGenerationStatusEnum.success,
       PDFGenerationStatusEnum.success,
-      PDFGenerationStatusEnum.missing_field,
+      PDFGenerationStatusEnum.missing_fields,
     ];
 
     const expected_messages = [
       PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
       PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
-      PDFGenerationStatusMessages[PDFGenerationStatusEnum.missing_field],
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.missing_fields],
     ];
 
     if (Array.isArray(status) && status.length === 3) {
