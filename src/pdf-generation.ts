@@ -76,7 +76,7 @@ export default class PDFGeneration implements PDFGenerationInterface {
    * method returns a key-value object.
    *
    * @param data - The data to be included in the PDF.
-   **/
+  ***/
   private build_model(data: pdf_data): Record<string, unknown> {
     const model: Record<string, unknown> = {};
 
