@@ -43,14 +43,13 @@ export enum FieldRequirement {
 export type ConfigFields = { [key: string]: FieldRequirement };
 
 /**
- * Plugin Output Status
+ * Enum representing the status of a plugin output operation.
  *
- * Enum defining the possible status values for the output of a plugin.
- *
- * @enum {string}
- * @readonly
- * @see CertificatesOutputPlugin
- **/
+ * @enum {number}
+ * @property {number} Success - Plugin ran successfully.
+ * @property {number} Warning - Plugin ran with issues, but non-fatal.
+ * @property {number} Failure - Plugin didn't run. It had fatal issues.
+ */
 export enum POStatus {
   Success, // Plugin ran successfully.
   Warning, // Plugin ran with issues, but non-fatal.
@@ -107,18 +106,54 @@ export interface CertificatesOutputPlugin {
   ) => Promise<PluginOuputStatus>;
 }
 
+/**
+ * Represents the configuration for a plugin.
+ *
+ * @typedef {Object} PluginConfig
+ * @property {string} id - The unique identifier for the plugin.
+ * @property {Object.<string, any>} config - A key-value pair object containing
+ * the plugin's configuration settings.
+ **/
 export type PluginConfig = {
   id: string;
   config: { [key: string]: any };
 };
 
+/**
+ * Represents the status of an output operation.
+ *
+ * @typedef {Object} OutputStatus
+ * @property {string} plugin_id - The identifier of the plugin.
+ * @property {string} status - The status of the output operation.
+ * @property {string} message - A message providing additional details about
+ *                              the status.
+ **/
 export type OutputStatus = {
   plugin_id: string;
   status: string;
   message: string;
 };
 
+/**
+ * Interface representing a manager for generating certificate outputs.
+ **/
 interface CertificatesOutputManager {
+  /**
+   * Generates the output for certificates using the provided plugins and data.
+   *
+   * @param plugins - An array containing the configuration for the plugins to
+   *                  be used.
+   * @param temp_dir - The temporary directory where the PDF certificate files
+   *                   exist and can be accessed by the plugin.
+   * @param certificates_data - The data related to the certificates to be
+   *                            processed (e.g., PDF file name of each
+   *                            certificate).
+   * @param issue_metadata - Additional metadata related to the certificate
+   *                         issuance (e.g., processed date, issue date, etc.).
+   *
+   * @returns An array of promises, each resolving to the status of the output
+   *          of each plugin.
+   **/
   generateOutput: (
     plugins: [PluginConfig],
     temp_dir: string,
