@@ -1,12 +1,12 @@
 /**
  * Interface for the PDF generation object.
-***/
+ **/
 export interface PDFGenerationInterface {
   /**
    * Sets the template for the PDF generation.
    *
    * @param template - Path to the template file to be used.
-  ***/
+   **/
   set_template: (template: string) => void;
 
   /**
@@ -15,7 +15,7 @@ export interface PDFGenerationInterface {
    * @see proc_config
    *
    * @param config - The processing configuration object.
-  ***/
+   **/
   set_proc_config: (config: proc_config) => void;
 
   /**
@@ -26,7 +26,7 @@ export interface PDFGenerationInterface {
    *
    * @param constants - The constants object.
    * @see pdf_data
-  ***/
+   **/
   set_constants: (constants: pdf_data) => void;
 
   /**
@@ -41,7 +41,7 @@ export interface PDFGenerationInterface {
    * @param data - The data to be included in the PDF.
    * @param output - The output file path for the generated PDF.
    * @see pdf_data
-  ***/
+   **/
   generate_pdf: (data: pdf_data, output: string) => Promise<PDFGeneratedStatus>;
 
   /**
@@ -60,7 +60,7 @@ export interface PDFGenerationInterface {
    * @param data - An array of data objects to be included in the PDFs.
    * @param output - An array of output file paths for the generated PDFs.
    * @see pdf_data
-  ***/
+   **/
   generate_pdfs: (
     data: pdf_data[],
     output: string[],
@@ -70,20 +70,20 @@ export interface PDFGenerationInterface {
 /**
  * Configuration for processing a template. This includes the delimiters used
  * to identify placeholders in the template.
-***/
+ **/
 export type proc_config = {
   /**
    * Delimiters used in the processing.
-  ***/
+   **/
   delimiters: {
     /**
      * The starting delimiter.
-    ***/
+     **/
     start: string;
 
     /**
      * The ending delimiter.
-    ***/
+     **/
     end: string;
   };
 };
@@ -101,7 +101,7 @@ export type proc_config = {
  *   ["date", "2023-10-01"],
  *   ["course", "Introduction to TypeScript"]
  * ];
-***/
+ **/
 export type pdf_data = [string, string][];
 
 /**
@@ -110,7 +110,7 @@ export type pdf_data = [string, string][];
  * The `success` field indicates whether the operation was successful. The
  * `message` field contains a message that describes the status of the
  * operation.
-***/
+ **/
 export type PDFGeneratedStatus = {
   status: PDFGenerationStatusEnum;
   message: string;
@@ -118,7 +118,7 @@ export type PDFGeneratedStatus = {
 
 /**
  * Represents the status of a PDF generation operation.
-***/
+ **/
 export enum PDFGenerationStatusEnum {
   success,
   missing_template_path,
@@ -130,7 +130,7 @@ export enum PDFGenerationStatusEnum {
 
 /**
  * Messages corresponding to the PDF generation status.
-***/
+ **/
 export const PDFGenerationStatusMessages = {
   [PDFGenerationStatusEnum.success]: "PDF generated successfully.",
   [PDFGenerationStatusEnum.missing_template_path]: "Template path not set.",
