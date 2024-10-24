@@ -10,7 +10,7 @@
     "test": "jest",
     "docs": "jsdoc -c jsdoc.config.json && http-server ./out -p 8080",
     "lintcheck": "prettier --check src/**/*.ts tests/**/*.ts",
-    "prettier": "prettier --write src/**/*.ts tests/**/*.ts"
+    "prettier": "prettier --write src/*.ts src/**/*.ts tests/**/*.ts"
   },
   "repository": {
     "type": "git",
