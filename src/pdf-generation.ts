@@ -8,7 +8,7 @@ import {
 } from "./pdf-gen-definitions";
 import path from "path";
 import fs from "fs";
-import { createReport, getMetadata, listCommands } from "docx-templates";
+import { createReport, listCommands } from "docx-templates";
 import libre from "libreoffice-convert";
 
 const libreConvertAsync = require("util").promisify(libre.convert);
