@@ -10,7 +10,7 @@
  * The Certificates Output Manager is a crucial part of the original design,
  * ensuring that the correct plugins are used and that they are configured
  * properly to generate the desired output.
- ***/
+ **/
 
 /**
  * Field Requirement
@@ -21,7 +21,7 @@
  * @readonly
  * @see ConfigFields
  * @see CertificatesOutputPlugin
- ***/
+ **/
 export enum FieldRequirement {
   Required,
   Optional,
@@ -58,9 +58,20 @@ export interface CertificatesOutputPlugin {
    **/
   getRequiredFields: () => ConfigFields;
   
+  /**
+   * Run
+   *
+   * Method to run the plugin and generate the output.
+   *
+   * @param {Object.<string, any>} config - The configuration for the plugin.
+   * @param {string} pdfs_temp_dir - The directory containing the PDFs.
+   * @param {Object.<string, any>[]} certificates_data - The data for the
+   * certificates.
+   **/
   run: (
     config: { [key: string]: any },
     pdfs_temp_dir: string,
     certificates_data: { [key: string]: any }[],
   ) => void;
 }
+
