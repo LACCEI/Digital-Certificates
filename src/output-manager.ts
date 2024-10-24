@@ -137,9 +137,10 @@ export type OutputStatus = {
 /**
  * Interface representing a manager for generating certificate outputs.
  **/
-interface CertificatesOutputManager {
+interface CertificatesOutputManagerInterface {
   /**
-   * Generates the output for certificates using the provided plugins and data.
+   * Send the output certifcates along with data and metadata to the instructed
+   * plugins (as long as they were successfully loaded).
    *
    * @param plugins - An array containing the configuration for the plugins to
    *                  be used.
@@ -161,3 +162,22 @@ interface CertificatesOutputManager {
     issue_metadata: { [key: string]: any },
   ) => Array<Promise<OutputStatus>>;
 }
+
+class CertificatesOutputManager implements CertificatesOutputManagerInterface {
+  private plugins: { [id: string]: CertificatesOutputPlugin }
+
+  constructor(plugins: { [id: string]: CertificatesOutputPlugin }) {
+    this.plugins = plugins;
+  }
+
+  generateOutput(
+    plugins: [PluginConfig],
+    temp_dir: string,
+    certificates_data: CertificatesData,
+    issue_metadata: { [key: string]: any },
+  ): Array<Promise<OutputStatus>> {
+    return [];
+  }
+}
+
+export default CertificatesOutputManager;
