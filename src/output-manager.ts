@@ -130,7 +130,7 @@ export type PluginConfig = {
  **/
 export type OutputStatus = {
   plugin_id: string;
-  status: string;
+  status: POStatus;
   message: string;
 };
 
@@ -138,6 +138,13 @@ export type OutputStatus = {
  * Interface representing a manager for generating certificate outputs.
  **/
 interface CertificatesOutputManagerInterface {
+  /**
+   * Set the directory where the plugins are located.
+   *
+   * @param dir - The directory where the plugins are located.
+   **/
+  set_plugins_dir: (dir: string) => void;
+  
   /**
    * Send the output certifcates along with data and metadata to the instructed
    * plugins (as long as they were successfully loaded).
@@ -156,7 +163,7 @@ interface CertificatesOutputManagerInterface {
    *          of each plugin.
    **/
   generateOutput: (
-    plugins: [PluginConfig],
+    plugins: Array<PluginConfig>,
     temp_dir: string,
     certificates_data: CertificatesData,
     issue_metadata: { [key: string]: any },
@@ -164,14 +171,19 @@ interface CertificatesOutputManagerInterface {
 }
 
 class CertificatesOutputManager implements CertificatesOutputManagerInterface {
-  private plugins: { [id: string]: CertificatesOutputPlugin }
+  private plugins: { [id: string]: CertificatesOutputPlugin };
+  private plugins_dir: string = '';
 
   constructor(plugins: { [id: string]: CertificatesOutputPlugin }) {
     this.plugins = plugins;
   }
 
+  set_plugins_dir(dir: string): void {
+    // Not implemented
+  }
+
   generateOutput(
-    plugins: [PluginConfig],
+    plugins: Array<PluginConfig>,
     temp_dir: string,
     certificates_data: CertificatesData,
     issue_metadata: { [key: string]: any },
