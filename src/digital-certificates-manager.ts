@@ -12,3 +12,13 @@
  * The module ensures that the entire certificate generation workflow is
  * executed seamlessly, from input reception to the final output distribution.
  **/
+
+/**
+ * Certificates Data
+ *
+ * Type definition for the data structure that holds the certificates
+ * information. It is represented as a 2D array where the first array are the
+ * keys (heading as in a table) and the subsequent arrays are the values for
+ * each certificate.
+ **/
+export type CertificatesData = [][];
