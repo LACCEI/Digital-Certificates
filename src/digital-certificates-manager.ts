@@ -21,7 +21,7 @@
  * keys (heading as in a table) and the subsequent arrays are the values for
  * each certificate.
  **/
-export type CertificatesData = [][];
+export type CertificatesData = Array<Array<string>>;
 
 export default class DigitalCertificatesManager {
   /**
@@ -35,14 +35,14 @@ export default class DigitalCertificatesManager {
    * @param output_plugins - An array of strings specifying the output plugins
    *                         to be used.
    * @param bundle_metadata - Metadata associated with the certificate bundle.
-   * @returns A promise that resolves to undefined when the certificates are 
+   * @returns A promise that resolves to undefined when the certificates are
    *          generated.
    **/
   generate_certificates(
     template_path: string,
     certificates_data: CertificatesData,
     output_plugins: string[],
-    bundle_metadata: any = {} // FIXME: What type should this be?
+    bundle_metadata: any = {}, // FIXME: What type should this be?
   ): Promise<undefined> {
     return new Promise((resolve, reject) => {
       // Generate PDFS.

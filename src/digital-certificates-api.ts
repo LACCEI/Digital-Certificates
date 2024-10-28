@@ -20,7 +20,7 @@ interface DigitalCertificatesAPIInterface {
   /**
    * Generates digital certificates for the given recipients using the
    * specified template and output plugins.
-   * 
+   *
    * The recipients' data is read from the file specified by the `recipients`
    * parameter. The file must be a CSV or Excel file, the format is determined
    * by the file extension.
@@ -75,13 +75,31 @@ interface RecipientsFileParserInterface {
 }
 
 class CSVParser implements RecipientsFileParserInterface {
-  read(recipients: string, config: any = { }): Promise<CertificatesData> {
-    return new Promise(resolve => {
+  read(
+    recipients: string,
+    config = {
+      escape: '"',
+      // [headers: Array<string>|boolean]: [],
+      newline: "\n",
+      quote: '"',
+      separator: ",", // delimiter
+    },
+  ): Promise<CertificatesData> {
+    return new Promise((resolve) => {
+      let output_data: CertificatesData = [];
+      let temp: Array<string> = [];
       fs.createReadStream(recipients)
-      .pipe(csvParser()) // FIXME: Not using config.
-      .on("data", (data: any) => {
-        resolve(data);
-      })
+        .pipe(csvParser(config)) // FIXME: Not using config.
+        .on("data", (data: any) => {
+          temp.push(data);
+        })
+        .on("end", () => {
+          output_data.push(Object.keys(temp[0]));
+          temp.forEach((row: any) => {
+            output_data.push(Object.values(row));
+          });
+          resolve(output_data);
+        });
     });
   }
 }
