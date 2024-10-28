@@ -10,12 +10,12 @@
 
 /**
  * Interface representing the Digital Certificates API.
-**/
+ **/
 interface DigitalCertificatesAPIInterface {
   /**
    * Generates digital certificates for the given recipients using the
    * specified template and output plugins.
-   * 
+   *
    * @param receipients - Path to the CSV file containing the recipients' data.
    * @param template_docx - A string representing the path to the DOCX
    *                        template file.
@@ -23,7 +23,7 @@ interface DigitalCertificatesAPIInterface {
    *                         to be used.
    * @returns A promise that resolves to undefined when the certificates
    *          are generated.
-  **/
+   **/
   generate_certificates: (
     receipients: string,
     template_docx: string,
@@ -31,7 +31,9 @@ interface DigitalCertificatesAPIInterface {
   ) => Promise<undefined>; // FIXME: What should it resolve to?
 }
 
-export default class DigitalCertificatesAPI implements DigitalCertificatesAPIInterface {
+export default class DigitalCertificatesAPI
+  implements DigitalCertificatesAPIInterface
+{
   generate_certificates(
     receipients: string,
     template_docx: string,

@@ -144,7 +144,7 @@ interface CertificatesOutputManagerInterface {
    * @param dir - The directory where the plugins are located.
    **/
   set_plugins_dir: (dir: string) => void;
-  
+
   /**
    * Send the output certifcates along with data and metadata to the instructed
    * plugins (as long as they were successfully loaded).
@@ -172,7 +172,7 @@ interface CertificatesOutputManagerInterface {
 
 class CertificatesOutputManager implements CertificatesOutputManagerInterface {
   private plugins: { [id: string]: CertificatesOutputPlugin };
-  private plugins_dir: string = '';
+  private plugins_dir: string = "";
 
   constructor(plugins: { [id: string]: CertificatesOutputPlugin }) {
     this.plugins = plugins;
