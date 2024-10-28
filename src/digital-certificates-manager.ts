@@ -25,19 +25,24 @@ export type CertificatesData = [][];
 
 export default class DigitalCertificatesManager {
   /**
-   * Generates digital certificates for the specified recipients using the
-   * provided template and output plugins.
+   * Generates digital certificates using the specified template and output
+   * plugins.
    *
-   * @param recipients - Path to the file containing the recipients' data.
-   * @param template_docx - Path to the DOCX template file.
+   * @param template_path - Path to the template file used for generating
+   *                        certificates.
+   * @param certificates_data - A 2D array containing the data for each
+   *                            certificate.
    * @param output_plugins - An array of strings specifying the output plugins
    *                         to be used.
-   * @returns A promise that resolves to undefined when the certificates
-   *          are generated.
+   * @param bundle_metadata - Metadata associated with the certificate bundle.
+   * @returns A promise that resolves to undefined when the certificates are 
+   *          generated.
    **/
   generate_certificates(
+    template_path: string,
     certificates_data: CertificatesData,
     output_plugins: string[],
+    bundle_metadata: any = {} // FIXME: What type should this be?
   ): Promise<undefined> {
     return new Promise((resolve, reject) => {
       // Generate PDFS.

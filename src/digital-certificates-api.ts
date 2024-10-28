@@ -11,6 +11,7 @@
 import csvParser from "csv-parser";
 import fs from "fs";
 import { CertificatesData } from "./digital-certificates-manager";
+import DigitalCertificatesManager from "./digital-certificates-manager";
 
 /**
  * Interface representing the Digital Certificates API.
@@ -35,7 +36,7 @@ interface DigitalCertificatesAPIInterface {
   generate_certificates: (
     recipients: string,
     template_docx: string,
-    output_plugins: [string],
+    output_plugins: Array<string>,
   ) => Promise<undefined>; // FIXME: What should it resolve to?
 }
 
@@ -45,11 +46,27 @@ export default class DigitalCertificatesAPI
   generate_certificates(
     recipients: string,
     template_docx: string,
-    output_plugins: [string],
+    output_plugins: Array<string>,
   ): Promise<undefined> {
     return new Promise((resolve, reject) => {
-      // Not implemented
+      const manager = new DigitalCertificatesManager();
+      const parser = this.get_parser(recipients);
+      parser.read(recipients, {}).then((data: CertificatesData) => {
+        manager.generate_certificates(template_docx, data, output_plugins); // FIXME: What should it resolve to?
+        resolve(undefined);
+      });
     });
+  }
+
+  private get_parser(recipients: string): RecipientsFileParserInterface {
+    const ext = recipients.split(".").pop();
+    if (ext === "csv") {
+      return new CSVParser();
+    } else if (ext === "xlsx") {
+      return new ExcelParser();
+    } else {
+      throw new Error("Unsupported file format.");
+    }
   }
 }
 
@@ -61,7 +78,7 @@ class CSVParser implements RecipientsFileParserInterface {
   read(recipients: string, config: any = { }): Promise<CertificatesData> {
     return new Promise(resolve => {
       fs.createReadStream(recipients)
-      .pipe(csvParser(config))
+      .pipe(csvParser()) // FIXME: Not using config.
       .on("data", (data: any) => {
         resolve(data);
       })
