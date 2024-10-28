@@ -8,6 +8,10 @@
  * internal modules (e.g., CSV or Excel into 2D array).
  **/
 
+import csvParser from "csv-parser";
+import fs from "fs";
+import { CertificatesData } from "./digital-certificates-manager";
+
 /**
  * Interface representing the Digital Certificates API.
  **/
@@ -15,8 +19,12 @@ interface DigitalCertificatesAPIInterface {
   /**
    * Generates digital certificates for the given recipients using the
    * specified template and output plugins.
+   * 
+   * The recipients' data is read from the file specified by the `recipients`
+   * parameter. The file must be a CSV or Excel file, the format is determined
+   * by the file extension.
    *
-   * @param receipients - Path to the CSV file containing the recipients' data.
+   * @param recipients - Path to the file containing the recipients' data.
    * @param template_docx - A string representing the path to the DOCX
    *                        template file.
    * @param output_plugins - An array of strings specifying the output plugins
@@ -25,7 +33,7 @@ interface DigitalCertificatesAPIInterface {
    *          are generated.
    **/
   generate_certificates: (
-    receipients: string,
+    recipients: string,
     template_docx: string,
     output_plugins: [string],
   ) => Promise<undefined>; // FIXME: What should it resolve to?
@@ -35,10 +43,34 @@ export default class DigitalCertificatesAPI
   implements DigitalCertificatesAPIInterface
 {
   generate_certificates(
-    receipients: string,
+    recipients: string,
     template_docx: string,
     output_plugins: [string],
   ): Promise<undefined> {
+    return new Promise((resolve, reject) => {
+      // Not implemented
+    });
+  }
+}
+
+interface RecipientsFileParserInterface {
+  read: (recipients: string, config: any) => Promise<CertificatesData>;
+}
+
+class CSVParser implements RecipientsFileParserInterface {
+  read(recipients: string, config: any = { }): Promise<CertificatesData> {
+    return new Promise(resolve => {
+      fs.createReadStream(recipients)
+      .pipe(csvParser(config))
+      .on("data", (data: any) => {
+        resolve(data);
+      })
+    });
+  }
+}
+
+class ExcelParser implements RecipientsFileParserInterface {
+  read(recipients: string, config: any): Promise<CertificatesData> {
     return new Promise((resolve, reject) => {
       // Not implemented
     });
