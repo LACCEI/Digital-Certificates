@@ -89,7 +89,7 @@ class CSVParser implements RecipientsFileParserInterface {
       let output_data: CertificatesData = [];
       let temp: Array<string> = [];
       fs.createReadStream(recipients)
-        .pipe(csvParser(config)) // FIXME: Not using config.
+        .pipe(csvParser(config))
         .on("data", (data: any) => {
           temp.push(data);
         })
