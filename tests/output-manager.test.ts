@@ -51,7 +51,7 @@ describe("CertificatesOutputManager", () => {
     expect(result.message.length).toBeGreaterThan(0);
   });
 
-  it("it should successfully load a plugin director and call a plugin", async () => {
+  it("it should successfully load a plugin directory and call a plugin", async () => {
     const plugins_path = get_absolute_path("output-manager/plugins");
     outputManager.set_plugins_dir(plugins_path);
     const results = outputManager.generateOutput(
