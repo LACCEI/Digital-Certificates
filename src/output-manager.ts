@@ -13,6 +13,7 @@
  **/
 
 import { CertificatesData } from "./digital-certificates-manager";
+import { IssueMetadataType } from "./pdf-gen-definitions";
 import fs from "fs";
 
 /**
@@ -63,11 +64,11 @@ export enum POStatus {
  * Pluging must return this type of object as the output status when called to
  * generate output.
  *
- * @typedef {Object} PluginOuputStatus
+ * @typedef {Object} PluginOutputStatus
  * @property {POStatus} status - The status of the plugin output.
  * @property {string} message - The message of the plugin output.
  **/
-export type PluginOuputStatus = {
+export type PluginOutputStatus = {
   status: POStatus;
   message: string;
 };
@@ -104,7 +105,8 @@ export interface CertificatesOutputPlugin {
     config: { [key: string]: any },
     pdfs_temp_dir: string,
     certificates_data: CertificatesData,
-  ) => Promise<PluginOuputStatus>;
+    issue_metadata: IssueMetadataType,
+  ) => Promise<PluginOutputStatus>;
 }
 
 /**
@@ -167,8 +169,8 @@ interface CertificatesOutputManagerInterface {
     plugins: Array<PluginConfig>,
     temp_dir: string,
     certificates_data: CertificatesData,
-    issue_metadata: { [key: string]: any },
-  ) => Array<Promise<OutputStatus>>;
+    issue_metadata: IssueMetadataType,
+  ) => Promise<Array<Promise<OutputStatus>>>;
 }
 
 type OutputPluginController = {
@@ -179,12 +181,7 @@ type OutputPluginController = {
 };
 
 class CertificatesOutputManager implements CertificatesOutputManagerInterface {
-  private plugins: { [id: string]: CertificatesOutputPlugin };
   private plugins_dir: string = "";
-
-  constructor(plugins: { [id: string]: CertificatesOutputPlugin }) {
-    this.plugins = plugins;
-  }
 
   set_plugins_dir(dir: string): void {
     if (!dir.startsWith("/")) {
@@ -193,6 +190,7 @@ class CertificatesOutputManager implements CertificatesOutputManagerInterface {
 
     if (fs.existsSync(dir)) {
       this.plugins_dir = dir;
+    } else {
       throw new Error("Directory does not exist.");
     }
   }
@@ -201,9 +199,42 @@ class CertificatesOutputManager implements CertificatesOutputManagerInterface {
     plugins: Array<PluginConfig>,
     temp_dir: string,
     certificates_data: CertificatesData,
-    issue_metadata: { [key: string]: any },
-  ): Array<Promise<OutputStatus>> {
-    return [];
+    issue_metadata: IssueMetadataType,
+  ): Promise<Array<Promise<OutputStatus>>> {
+    return new Promise(async (resolve) => {
+      const output_plugins = await this.get_plugins();
+
+      const results: Array<Promise<OutputStatus>> = plugins.map((plugin) => {
+        const output_plugin = output_plugins.find(
+          (op) => op.id === plugin.id && op.valid,
+        );
+
+        return new Promise(async (resolve_plg) => {
+          if (output_plugin) {
+            let tmp = await output_plugin.run_plugin(
+              plugin.config,
+              temp_dir,
+              certificates_data,
+              issue_metadata,
+            );
+
+            resolve_plg({
+              plugin_id: plugin.id,
+              status: tmp.status,
+              message: tmp.message,
+            });
+          } else {
+            resolve_plg({
+              plugin_id: plugin.id,
+              status: POStatus.Failure,
+              message: "Plugin not found or invalid.",
+            });
+          }
+        });
+      });
+
+      resolve(results);
+    });
   }
 
   private get_plugins(): Promise<Array<OutputPluginController>> {
@@ -227,7 +258,7 @@ class CertificatesOutputManager implements CertificatesOutputManagerInterface {
 
   private load_plugin(path: string): Promise<OutputPluginController> {
     return new Promise(async (resolve) => {
-      const plugin = (await import(path)) as CertificatesOutputPlugin;
+      const plugin = (await import(path)).default as CertificatesOutputPlugin;
       const config = plugin.getRequiredFields();
       const plugin_id = path.split("/").pop()?.split(".").shift() || path;
 

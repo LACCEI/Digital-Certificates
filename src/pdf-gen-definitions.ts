@@ -140,3 +140,10 @@ export const PDFGenerationStatusMessages = {
   [PDFGenerationStatusEnum.extra_fields]: "Extra fields in data.",
   [PDFGenerationStatusEnum.unknown_error]: "Unknown error occurred.",
 };
+
+export type IssueMetadataType = {
+  issue_timestamp: string;
+  others: {
+    [key: string]: string;
+  };
+};

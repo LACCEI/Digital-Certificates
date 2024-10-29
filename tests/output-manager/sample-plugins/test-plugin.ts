@@ -11,12 +11,12 @@ import {
   FieldRequirement,
   PluginOutputStatus,
   POStatus,
-} from "../output-manager";
+} from "../../../src/output-manager";
 
-import { CertificatesData } from "../digital-certificates-manager";
-import { IssueMetadataType } from "../pdf-gen-definitions";
+import { CertificatesData } from "../../../src/digital-certificates-manager";
+import { IssueMetadataType } from "../../../src/pdf-gen-definitions";
 
-const LocalPlugin: CertificatesOutputPlugin = {
+const TestPlugin: CertificatesOutputPlugin = {
   getRequiredFields(): ConfigFields {
     return {
       // The folder where the output PDFs will be saved.
@@ -43,4 +43,4 @@ const LocalPlugin: CertificatesOutputPlugin = {
   }
 }
 
-export default LocalPlugin;
+export default TestPlugin;

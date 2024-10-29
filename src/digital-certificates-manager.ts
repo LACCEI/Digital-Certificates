@@ -13,7 +13,7 @@
  * executed seamlessly, from input reception to the final output distribution.
  **/
 
-import { PluginOuputStatus } from "./output-manager";
+import { PluginOutputStatus } from "./output-manager";
 
 /**
  * Certificates Data
@@ -47,12 +47,12 @@ export enum GenStatusEnum {
  * @typedef {Object} GenerationStatus
  * @property {GenStatusEnum} status - The current status of the generation process.
  * @property {string} message - A message providing additional information about the status.
- * @property {Array<PluginOuputStatus>} output_plugins_status - An array containing the status of each output plugin.
+ * @property {Array<PluginOutputStatus>} output_plugins_status - An array containing the status of each output plugin.
  */
 export type GenerationStatus = {
   status: GenStatusEnum;
   message: string;
-  output_plugins_status: Array<PluginOuputStatus>;
+  output_plugins_status: Array<PluginOutputStatus>;
 };
 
 export default class DigitalCertificatesManager {
