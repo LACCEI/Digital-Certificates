@@ -147,10 +147,10 @@ describe("PDFGeneration - Working with one document", () => {
       files.output,
     );
 
-    expect(status.status).toEqual(PDFGenerationStatusEnum.success);
     expect(status.message).toEqual(
       PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
     );
+    expect(status.status).toEqual(PDFGenerationStatusEnum.success);
     // expect(compareFiles(files.output, files.expected)).toBeTruthy();
   });
 
@@ -176,10 +176,10 @@ describe("PDFGeneration - Working with one document", () => {
       files.output,
     );
 
-    expect(status.status).toEqual(PDFGenerationStatusEnum.success);
     expect(status.message).toEqual(
       PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
     );
+    expect(status.status).toEqual(PDFGenerationStatusEnum.success);
     // expect(compareFiles(files.output, files.expected)).toBeTruthy();
   });
 
@@ -211,10 +211,10 @@ describe("PDFGeneration - Working with one document", () => {
       files.output,
     );
 
-    expect(status.status).toEqual(PDFGenerationStatusEnum.success);
     expect(status.message).toEqual(
       PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
     );
+    expect(status.status).toEqual(PDFGenerationStatusEnum.success);
     // expect(compareFiles(files.output, files.expected)).toBeTruthy();
   });
 });
@@ -320,8 +320,8 @@ describe("PDFGeneration - Working with multiple documents", () => {
 
     if (Array.isArray(status) && status.length === 3) {
       status.forEach((s, i) => {
-        expect(s.status).toEqual(expected_outputs[i]);
         expect(s.message).toEqual(expected_messages[i]);
+        expect(s.status).toEqual(expected_outputs[i]);
       });
     } else {
       fail("Expected an array of statuses of length 3.");
@@ -363,8 +363,8 @@ describe("PDFGeneration - Working with multiple documents", () => {
 
     if (Array.isArray(status) && status.length === 3) {
       status.forEach((s, i) => {
-        expect(s.status).toEqual(expected_outputs[i]);
         expect(s.message).toEqual(expected_messages[i]);
+        expect(s.status).toEqual(expected_outputs[i]);
       });
     } else {
       fail("Expected an array of statuses of length 3.");
@@ -395,8 +395,8 @@ describe("PDFGeneration - Working with multiple documents", () => {
 
     if (Array.isArray(status) && status.length === 2) {
       status.forEach((s, i) => {
-        expect(s.status).toEqual(expected_outputs[i]);
         expect(s.message).toEqual(expected_messages[i]);
+        expect(s.status).toEqual(expected_outputs[i]);
         // expect(compareFiles(files.output[i], files.expected)).toBeTruthy();
       });
     } else {
