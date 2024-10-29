@@ -25,16 +25,19 @@ interface DigitalCertificatesAPIInterface {
    * specified template and output plugins.
    *
    * The recipients' data is read from the file specified by the `recipients`
-   * parameter. The file must be a CSV or Excel file, the format is determined
-   * by the file extension.
+   * parameter. The file must be in CSV format. Excel format is not supported
+   * yet.
+   *
+   * If the recipients or the template_docx file does not exist, an error is
+   * thrown.
    *
    * @param recipients - Path to the file containing the recipients' data.
-   * @param template_docx - A string representing the path to the DOCX
-   *                        template file.
+   * @param template_docx - Path to the DOCX template file.
    * @param output_plugins - An array of strings specifying the output plugins
    *                         to be used.
-   * @returns A promise that resolves to undefined when the certificates
-   *          are generated.
+   * @param tmp_folder - Path to the temporary folder for intermediate files.
+   * @returns A promise that resolves to a GenerationStatus object when the
+   *          certificates are generated.
    **/
   generate_certificates: (
     recipients: string,
@@ -53,9 +56,19 @@ export default class DigitalCertificatesAPI
     output_plugins: Array<string>,
     tmp_folder: string = "./tmp",
   ): Promise<GenerationStatus> {
-    return new Promise((resolve) => {
-      recipients = path.resolve(__dirname, recipients);
+    return new Promise((resolve, reject) => {
+      recipients = path.resolve(__dirname, recipients); // FIXME: Add tests to check if this work even if absolute paths are provided.
       tmp_folder = path.resolve(__dirname, tmp_folder);
+
+      template_docx = path.isAbsolute(template_docx)
+        ? template_docx
+        : path.resolve(__dirname, template_docx);
+
+      if (!fs.existsSync(template_docx)) {
+        reject(new Error(`Template file ${template_docx} does not exist.`));
+      } else if (!fs.existsSync(recipients)) {
+        reject(new Error(`Recipients file ${recipients} does not exist.`));
+      }
 
       const parser = this.get_parser(recipients);
       const manager = new DigitalCertificatesManager();
