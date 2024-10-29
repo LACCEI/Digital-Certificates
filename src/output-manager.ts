@@ -171,6 +171,13 @@ interface CertificatesOutputManagerInterface {
   ) => Array<Promise<OutputStatus>>;
 }
 
+type OutputPluginController = {
+  id: string;
+  valid: boolean;
+  config: { [key: string]: any };
+  run_plugin: CertificatesOutputPlugin["run"];
+};
+
 class CertificatesOutputManager implements CertificatesOutputManagerInterface {
   private plugins: { [id: string]: CertificatesOutputPlugin };
   private plugins_dir: string = "";
@@ -199,6 +206,14 @@ class CertificatesOutputManager implements CertificatesOutputManagerInterface {
     return [];
   }
 
+  private get_plugins(): Promise<Array<OutputPluginController>> {
+    return new Promise(async (resolve) => {
+      const paths = this.get_plugin_paths();
+      const plugins = await Promise.all(paths.map(this.load_plugin));
+      resolve(plugins);
+    });
+  }
+
   private get_plugin_paths(): Array<string> {
     if (!this.plugins_dir) {
       throw new Error("Plugins directory is not set.");
@@ -210,9 +225,32 @@ class CertificatesOutputManager implements CertificatesOutputManagerInterface {
       .map((file) => `${this.plugins_dir}/${file}`);
   }
 
-  private load_plugin(id: string): CertificatesOutputPlugin {
-    // FIXME: Pending implementation.
-    return this.plugins[id];
+  private load_plugin(path: string): Promise<OutputPluginController> {
+    return new Promise(async (resolve) => {
+      const plugin = (await import(path)) as CertificatesOutputPlugin;
+      const config = plugin.getRequiredFields();
+      const plugin_id = path.split("/").pop()?.split(".").shift() || path;
+
+      let controller: OutputPluginController = {
+        id: plugin_id,
+        valid: true,
+        config: config,
+        run_plugin: plugin["run"],
+      };
+
+      for (const key in config) {
+        if (!(config[key] in FieldRequirement)) {
+          controller.valid = false;
+          break;
+        }
+      }
+
+      if (typeof controller.run_plugin !== "function") {
+        controller.valid = false;
+      }
+
+      resolve(controller);
+    });
   }
 }
 
