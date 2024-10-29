@@ -13,6 +13,7 @@
  **/
 
 import { CertificatesData } from "./digital-certificates-manager";
+import fs from "fs";
 
 /**
  * Field Requirement
@@ -179,7 +180,14 @@ class CertificatesOutputManager implements CertificatesOutputManagerInterface {
   }
 
   set_plugins_dir(dir: string): void {
-    // Not implemented
+    if (!dir.startsWith("/")) {
+      dir = `${process.cwd()}/${dir}`;
+    }
+
+    if (fs.existsSync(dir)) {
+      this.plugins_dir = dir;
+      throw new Error("Directory does not exist.");
+    }
   }
 
   generateOutput(
@@ -189,6 +197,22 @@ class CertificatesOutputManager implements CertificatesOutputManagerInterface {
     issue_metadata: { [key: string]: any },
   ): Array<Promise<OutputStatus>> {
     return [];
+  }
+
+  private get_plugin_paths(): Array<string> {
+    if (!this.plugins_dir) {
+      throw new Error("Plugins directory is not set.");
+    }
+
+    const files = fs.readdirSync(this.plugins_dir);
+    return files
+      .filter(file => file.endsWith(".ts") || file.endsWith(".js"))
+      .map(file => `${this.plugins_dir}/${file}`);
+  }
+
+  private load_plugin(id: string): CertificatesOutputPlugin {
+    // FIXME: Pending implementation.
+    return this.plugins[id];
   }
 }
 
