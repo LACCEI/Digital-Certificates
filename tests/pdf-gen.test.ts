@@ -7,6 +7,7 @@ import {
   pdf_data,
 } from "../src/pdf-gen-definitions";
 import path from "path";
+import fs from "fs";
 
 function get_absolute_path(filePath: string): string {
   const absolutePath = path.isAbsolute(filePath)
@@ -18,7 +19,6 @@ function get_absolute_path(filePath: string): string {
 function compareFiles(file1: string, file2: string): boolean {
   const file1_path = get_absolute_path(file1);
   const file2_path = get_absolute_path(file2);
-  const fs = require("fs");
   const f1 = fs.readFileSync(file1_path, "utf8");
   const f2 = fs.readFileSync(file2_path, "utf8");
   return f1 === f2;
@@ -32,6 +32,13 @@ describe("PDFGeneration - Working with one document", () => {
     output: "../tests/output",
     expected: "../tests/expected",
   };
+
+  beforeAll(() => {
+    dirs.output = get_absolute_path(dirs.output);
+    if (!fs.existsSync(dirs.output)) {
+      fs.mkdirSync(dirs.output, { recursive: true });
+    }
+  });
 
   const singleDataSample: pdf_data = [
     ["name", "John Doe"],

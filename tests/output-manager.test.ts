@@ -13,7 +13,7 @@ function get_sample_issue_metadata(): IssueMetadataType {
     issue_timestamp: new Date().toISOString(),
     others: {
       event_title: "Sample Event",
-    }
+    },
   };
 }
 

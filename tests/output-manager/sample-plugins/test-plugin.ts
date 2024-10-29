@@ -40,7 +40,7 @@ const TestPlugin: CertificatesOutputPlugin = {
         message: "Success",
       });
     });
-  }
-}
+  },
+};
 
 export default TestPlugin;

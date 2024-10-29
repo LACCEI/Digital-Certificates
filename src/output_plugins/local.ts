@@ -40,7 +40,7 @@ const LocalPlugin: CertificatesOutputPlugin = {
         message: "Success",
       });
     });
-  }
-}
+  },
+};
 
 export default LocalPlugin;
