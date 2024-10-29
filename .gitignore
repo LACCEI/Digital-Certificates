@@ -3,6 +3,7 @@ out/
 
 # Output from tests.
 /tests/output/*
+**/tmp/
 
 # Logs
 logs
