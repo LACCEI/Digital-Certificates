@@ -206,8 +206,8 @@ class CertificatesOutputManager implements CertificatesOutputManagerInterface {
 
     const files = fs.readdirSync(this.plugins_dir);
     return files
-      .filter(file => file.endsWith(".ts") || file.endsWith(".js"))
-      .map(file => `${this.plugins_dir}/${file}`);
+      .filter((file) => file.endsWith(".ts") || file.endsWith(".js"))
+      .map((file) => `${this.plugins_dir}/${file}`);
   }
 
   private load_plugin(id: string): CertificatesOutputPlugin {
