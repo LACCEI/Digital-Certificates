@@ -13,6 +13,8 @@
  * executed seamlessly, from input reception to the final output distribution.
  **/
 
+import { PluginOuputStatus } from "./output-manager";
+
 /**
  * Certificates Data
  *
@@ -22,6 +24,36 @@
  * each certificate.
  **/
 export type CertificatesData = Array<Array<string>>;
+
+/**
+ * Generation Status Enum
+ *
+ * Enum representing the status of a generation process.
+ *
+ * @enum {number}
+ * @property {number} Success - Generation process completed successfully.
+ * @property {number} Warning - Generation process completed with warnings.
+ * @property {number} Failure - Generation process failed.
+ **/
+export enum GenStatusEnum {
+  Success,
+  Warning,
+  Failure,
+}
+
+/**
+ * Represents the status of a generation process.
+ *
+ * @typedef {Object} GenerationStatus
+ * @property {GenStatusEnum} status - The current status of the generation process.
+ * @property {string} message - A message providing additional information about the status.
+ * @property {Array<PluginOuputStatus>} output_plugins_status - An array containing the status of each output plugin.
+ */
+export type GenerationStatus = {
+  status: GenStatusEnum;
+  message: string;
+  output_plugins_status: Array<PluginOuputStatus>;
+};
 
 export default class DigitalCertificatesManager {
   /**
@@ -42,11 +74,17 @@ export default class DigitalCertificatesManager {
     template_path: string,
     certificates_data: CertificatesData,
     output_plugins: string[],
+    tmp_folder: string = "./tmp",
     bundle_metadata: any = {}, // FIXME: What type should this be?
-  ): Promise<undefined> {
+  ): Promise<GenerationStatus> {
     return new Promise((resolve, reject) => {
       // Generate PDFS.
       // Call on each output plugin.
+      resolve({
+        status: GenStatusEnum.Failure,
+        message: "Failed to generate certificates.",
+        output_plugins_status: [],
+      });
     });
   }
 

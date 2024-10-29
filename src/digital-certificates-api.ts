@@ -8,10 +8,13 @@
  * internal modules (e.g., CSV or Excel into 2D array).
  **/
 
-import csvParser from "csv-parser";
 import fs from "fs";
+import path from "path";
 import { CertificatesData } from "./digital-certificates-manager";
-import DigitalCertificatesManager from "./digital-certificates-manager";
+import DigitalCertificatesManager, {
+  GenerationStatus,
+} from "./digital-certificates-manager";
+import csvParser from "csv-parser";
 
 /**
  * Interface representing the Digital Certificates API.
@@ -37,7 +40,8 @@ interface DigitalCertificatesAPIInterface {
     recipients: string,
     template_docx: string,
     output_plugins: Array<string>,
-  ) => Promise<undefined>; // FIXME: What should it resolve to?
+    tmp_folder: string,
+  ) => Promise<GenerationStatus>; // FIXME: What should it resolve to?
 }
 
 export default class DigitalCertificatesAPI
@@ -47,13 +51,24 @@ export default class DigitalCertificatesAPI
     recipients: string,
     template_docx: string,
     output_plugins: Array<string>,
-  ): Promise<undefined> {
-    return new Promise((resolve, reject) => {
-      const manager = new DigitalCertificatesManager();
+    tmp_folder: string = "./tmp",
+  ): Promise<GenerationStatus> {
+    return new Promise((resolve) => {
+      recipients = path.resolve(__dirname, recipients);
+      tmp_folder = path.resolve(__dirname, tmp_folder);
+
       const parser = this.get_parser(recipients);
-      parser.read(recipients, {}).then((data: CertificatesData) => {
-        manager.generate_certificates(template_docx, data, output_plugins); // FIXME: What should it resolve to?
-        resolve(undefined);
+      const manager = new DigitalCertificatesManager();
+
+      this.create_tmp_folder(tmp_folder);
+
+      parser.read(recipients, {}).then(async (data: CertificatesData) => {
+        let gen_status = await manager.generate_certificates(
+          template_docx,
+          data,
+          output_plugins,
+        );
+        resolve(gen_status);
       });
     });
   }
@@ -63,9 +78,16 @@ export default class DigitalCertificatesAPI
     if (ext === "csv") {
       return new CSVParser();
     } else if (ext === "xlsx") {
-      return new ExcelParser();
+      throw new Error("Excel format not supported yet.");
+      // return new ExcelParser();
     } else {
       throw new Error("Unsupported file format.");
+    }
+  }
+
+  private create_tmp_folder(tmp_folder: string): void {
+    if (!fs.existsSync(tmp_folder)) {
+      fs.mkdirSync(tmp_folder);
     }
   }
 }
