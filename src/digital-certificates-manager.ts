@@ -14,6 +14,7 @@
  **/
 
 import { PluginOutputStatus } from "./output-manager";
+import { IssueMetadataType } from "./pdf-gen-definitions";
 
 /**
  * Certificates Data
@@ -56,6 +57,23 @@ export type GenerationStatus = {
 };
 
 export default class DigitalCertificatesManager {
+  private metadata: IssueMetadataType;
+  
+  /**
+   * Constructor
+   *
+   * Initializes the digital certificates manager with the specified metadata.
+   *
+   * @param metadata - Metadata associated with the bundle being created.
+   **/
+  constructor(metadata: any) {
+    const current_timestamp = new Date().toISOString();
+    this.metadata = {
+      issue_timestamp: current_timestamp,
+      others: metadata
+    };
+  }
+
   /**
    * Generates digital certificates using the specified template and output
    * plugins.
