@@ -15,6 +15,7 @@
 import { CertificatesData } from "./digital-certificates-manager";
 import { IssueMetadataType } from "./pdf-gen-definitions";
 import fs from "fs";
+import path from "path";
 
 /**
  * Field Requirement
@@ -184,8 +185,8 @@ class CertificatesOutputManager implements CertificatesOutputManagerInterface {
   private plugins_dir: string = "";
 
   set_plugins_dir(dir: string): void {
-    if (!dir.startsWith("/")) {
-      dir = `${process.cwd()}/${dir}`;
+    if (!path.isAbsolute(dir)) {
+      dir = path.resolve(dir);
     }
 
     if (fs.existsSync(dir)) {

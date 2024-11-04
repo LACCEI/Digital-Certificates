@@ -141,9 +141,22 @@ export const PDFGenerationStatusMessages = {
   [PDFGenerationStatusEnum.unknown_error]: "Unknown error occurred.",
 };
 
+/**
+ * Bundle Metadata
+ *
+ * The bundle metadata contains information to pass to the output plugins. Each
+ * plugin has an id, which also passed as an array of strings to the
+ * generate_certificates method. The bundle metadata object has the data passed
+ * to each plugin as a key-value pair, where the key is the plugin id.
+ **/
+export type output_plugins_data_type = {
+  [key: string]: any;
+};
+
+/**
+ *
+ **/
 export type IssueMetadataType = {
   issue_timestamp: string;
-  others: {
-    [key: string]: string;
-  };
+  others: any;
 };
