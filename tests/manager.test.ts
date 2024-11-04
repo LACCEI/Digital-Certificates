@@ -45,7 +45,10 @@ describe("DigitalCertificatesManager", () => {
     };
 
     const data_exp: pdf_data[] = data.slice(1).map((row) => {
-      return row.map((value, index): [string, string] => [data[0][index], value]);
+      return row.map((value, index): [string, string] => [
+        data[0][index],
+        value,
+      ]);
     });
 
     // jest.spyOn(PDFGeneration, "generate_pdfs").mockResolvedValue();

@@ -108,9 +108,10 @@ export default class DigitalCertificatesManager {
     tmp_folder: string = "./tmp",
     output_plugins_data: output_plugins_data_type = {},
     bundle_metadata: any = {},
-  ): Promise<GenerationStatus> { // FIXME: This method needs serious refactoring. It is too long.
+  ): Promise<GenerationStatus> {
+    // FIXME: This method needs serious refactoring. It is too long.
     this.metadata.others = bundle_metadata;
-    
+
     return new Promise((resolve) => {
       const pdf_data: pdf_data[] = certificates_data
         .slice(1)
