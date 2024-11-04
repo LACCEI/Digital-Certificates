@@ -16,6 +16,8 @@ import {
 import { CertificatesData } from "../digital-certificates-manager";
 import { IssueMetadataType } from "../pdf-gen-definitions";
 
+import path from "path";
+
 const LocalPlugin: CertificatesOutputPlugin = {
   getRequiredFields(): ConfigFields {
     return {
@@ -34,7 +36,57 @@ const LocalPlugin: CertificatesOutputPlugin = {
     certificates_data: CertificatesData,
     issue_metadata: IssueMetadataType,
   ): Promise<PluginOutputStatus> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
+      if (!config.output_folder) {
+        resolve({
+          status: POStatus.Failure,
+          message: "Output folder not provided",
+        });
+
+        return;
+      }
+
+      const output_dir: string = path.resolve(config.output_folder);
+      let use_col_filename: boolean = false;
+      let col_filename: number = -1;
+      if (config.output_filename_col) {
+        for (let i = 0; i < certificates_data[0].length; i++) {
+          let col_heading: string = certificates_data[0][i];
+          if (col_heading === config.output_filename_col) {
+            use_col_filename = true;
+            col_filename = i;
+            break;
+          }
+        }
+      }
+
+      try {
+        certificates_data.slice(1).forEach((row: string[], index) => {
+          let filename: string;
+          if (use_col_filename) {
+            filename = row[col_filename];
+          } else {
+            filename = (index + 1).toString();
+          }
+
+          const output_path: string = path.join(output_dir, filename + ".pdf");
+          const output_pdf_path: string = path.join(
+            pdfs_temp_dir,
+            filename + ".pdf",
+          );
+
+          // Copy the PDF from the temporary directory to the output directory.
+          require("fs").copyFileSync(output_pdf_path, output_path);
+        });
+      } catch (error) {
+        resolve({
+          status: POStatus.Failure,
+          message: "Error copying PDFs to output folder. Error: " + error,
+        });
+
+        return;
+      }
+
       resolve({
         status: POStatus.Success,
         message: "Success",
