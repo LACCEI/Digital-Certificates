@@ -35,10 +35,13 @@ describe("DigitalCertificatesAPI", () => {
 
       jest.spyOn(fs, "readFileSync").mockReturnValue(csvContent);
 
+      const tmp_folder = path.resolve("./tmp");
+
       await digitalCertificatesAPI.generate_certificates(
         simple_csv_file_path,
         template_filepath,
         [],
+        tmp_folder
       );
 
       const generate_certificatesMock = (
@@ -54,6 +57,9 @@ describe("DigitalCertificatesAPI", () => {
           ["Alice Johnson", "2023-10-03", "Chemistry"],
         ],
         [],
+        {},
+        {},
+        tmp_folder,
       );
       expect(generate_certificatesMock).toHaveBeenCalledTimes(1);
     });
@@ -83,10 +89,13 @@ describe("load Excel files", () => {
 
     expect(DigitalCertificatesManager).not.toHaveBeenCalled();
 
+    const tmp_folder = path.resolve("./tmp");
+
     await digitalCertificatesAPI.generate_certificates(
       simple_excel_file_path,
       template_filepath,
       [],
+      tmp_folder
     );
 
     const generate_certificatesMock = (
@@ -102,6 +111,9 @@ describe("load Excel files", () => {
         ["Alice Johnson", "2023-10-03", "Chemistry"],
       ],
       [],
+      {},
+      {},
+      tmp_folder,
     );
     expect(generate_certificatesMock).toHaveBeenCalledTimes(1);
   });

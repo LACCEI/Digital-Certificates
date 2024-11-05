@@ -71,8 +71,9 @@ describe("DigitalCertificatesManager", () => {
       template,
       data,
       outputPlugins,
-      tmpFolder,
+      {},
       metadata,
+      tmpFolder,
     );
 
     expect(generate_pdfs_args_recv.pdf_data).toEqual(data_exp);
