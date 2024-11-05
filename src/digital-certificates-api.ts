@@ -15,6 +15,7 @@ import DigitalCertificatesManager, {
   GenerationStatus,
 } from "./digital-certificates-manager";
 import csvParser from "csv-parser";
+import ExcelJS from "exceljs";
 
 /**
  * Interface representing the Digital Certificates API.
@@ -57,12 +58,17 @@ export default class DigitalCertificatesAPI
     tmp_folder: string = "./tmp",
   ): Promise<GenerationStatus> {
     return new Promise((resolve, reject) => {
-      recipients = path.resolve(__dirname, recipients); // FIXME: Add tests to check if this work even if absolute paths are provided.
-      tmp_folder = path.resolve(__dirname, tmp_folder);
+      if (!path.isAbsolute(recipients)) {
+        recipients = path.resolve(recipients); // FIXME: Add tests to check if this work even if absolute paths are provided.
+      }
+
+      if (!path.isAbsolute(tmp_folder)) {
+        tmp_folder = path.resolve(__dirname, tmp_folder);
+      }
 
       template_docx = path.isAbsolute(template_docx)
         ? template_docx
-        : path.resolve(__dirname, template_docx);
+        : path.resolve(template_docx);
 
       if (!fs.existsSync(template_docx)) {
         reject(new Error(`Template file ${template_docx} does not exist.`));
@@ -91,8 +97,8 @@ export default class DigitalCertificatesAPI
     if (ext === "csv") {
       return new CSVParser();
     } else if (ext === "xlsx") {
-      throw new Error("Excel format not supported yet.");
-      // return new ExcelParser();
+      // throw new Error("Excel format not supported yet.");
+      return new ExcelParser();
     } else {
       throw new Error("Unsupported file format.");
     }
@@ -140,9 +146,32 @@ class CSVParser implements RecipientsFileParserInterface {
 }
 
 class ExcelParser implements RecipientsFileParserInterface {
-  read(recipients: string, config: any): Promise<CertificatesData> {
-    return new Promise((resolve, reject) => {
-      // Not implemented
+  read(
+    recipients: string,
+    config: {
+      target_sheet?: string;
+    } = {},
+  ): Promise<CertificatesData> {
+    return new Promise(async (resolve) => {
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.readFile(recipients);
+
+      const worksheet = workbook.worksheets[0]; // FIXME: Must be a different behavior if the target_sheet is specified.
+      const data: CertificatesData = [];
+
+      worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+        const rowData: Array<string> = [];
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          // Evaluate formulas and get the calculated value
+          const cellValue: string = cell.formula
+            ? String(cell.result)
+            : String(cell.value);
+          rowData.push(cellValue);
+        });
+        data.push(rowData);
+      });
+
+      resolve(data);
     });
   }
 }
