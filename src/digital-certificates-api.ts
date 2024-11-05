@@ -14,6 +14,7 @@ import { CertificatesData } from "./digital-certificates-manager";
 import DigitalCertificatesManager, {
   GenerationStatus,
 } from "./digital-certificates-manager";
+import { output_plugins_data_type } from "./pdf-gen-definitions";
 import csvParser from "csv-parser";
 import ExcelJS from "exceljs";
 
@@ -45,6 +46,8 @@ interface DigitalCertificatesAPIInterface {
     template_docx: string,
     output_plugins: Array<string>,
     tmp_folder: string,
+    output_plugins_data: output_plugins_data_type,
+    bundle_metadata: any,
   ) => Promise<GenerationStatus>; // FIXME: What should it resolve to?
 }
 
@@ -56,6 +59,8 @@ export default class DigitalCertificatesAPI
     template_docx: string,
     output_plugins: Array<string>,
     tmp_folder: string = "./tmp",
+    output_plugins_data: output_plugins_data_type = {},
+    bundle_metadata: any = {},
   ): Promise<GenerationStatus> {
     return new Promise((resolve, reject) => {
       if (!path.isAbsolute(recipients)) {
@@ -86,6 +91,9 @@ export default class DigitalCertificatesAPI
           template_docx,
           data,
           output_plugins,
+          output_plugins_data,
+          bundle_metadata,
+          tmp_folder,
         );
         resolve(gen_status);
       });

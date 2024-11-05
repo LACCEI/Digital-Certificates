@@ -150,7 +150,9 @@ export const PDFGenerationStatusMessages = {
  * to each plugin as a key-value pair, where the key is the plugin id.
  **/
 export type output_plugins_data_type = {
-  [key: string]: any;
+  [key: string]: {
+    [key: string]: any;
+  };
 };
 
 /**

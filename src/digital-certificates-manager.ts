@@ -105,9 +105,9 @@ export default class DigitalCertificatesManager {
     template_path: string,
     certificates_data: CertificatesData,
     output_plugins: string[],
-    tmp_folder: string = "./tmp",
     output_plugins_data: output_plugins_data_type = {},
     bundle_metadata: any = {},
+    tmp_folder: string = "./tmp",
   ): Promise<GenerationStatus> {
     // FIXME: This method needs serious refactoring. It is too long.
     this.metadata.others = bundle_metadata;
