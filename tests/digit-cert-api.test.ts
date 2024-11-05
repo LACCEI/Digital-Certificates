@@ -75,7 +75,6 @@ describe("load Excel files", () => {
       __dirname,
       "./sample-files/simple-list.xlsx",
     );
-    console.log(simple_excel_file_path);
 
     const template_filepath = path.resolve(
       __dirname,
