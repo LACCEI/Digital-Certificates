@@ -19,11 +19,13 @@ import {
   output_plugins_data_type,
   pdf_data,
   PDFGeneratedStatus,
+  PDFGenerationStatusEnum,
 } from "./pdf-gen-definitions";
 import PDFGeneration from "./pdf-generation";
 import CertificatesOutputManager from "./output-manager";
 
 import path from "path";
+import fs from "fs";
 
 /**
  * Certificates Data
@@ -62,6 +64,7 @@ export enum GenStatusEnum {
 export type GenerationStatus = {
   status: GenStatusEnum;
   message: string;
+  generation_status: PDFGeneratedStatus | Array<PDFGeneratedStatus>;
   output_plugins_status: Array<PluginOutputStatus>;
 };
 
@@ -124,6 +127,11 @@ export default class DigitalCertificatesManager {
 
       const time = new Date(this.metadata.issue_timestamp).getTime();
       const temp_dir_abs_path = path.resolve(tmp_folder, time.toString());
+
+      if (!fs.existsSync(temp_dir_abs_path)) {
+        fs.mkdirSync(temp_dir_abs_path, { recursive: true });
+      }
+
       const output_paths: Array<string> = certificates_data
         .slice(1)
         .map((_data, index) => {
@@ -137,6 +145,7 @@ export default class DigitalCertificatesManager {
           resolve({
             status: GenStatusEnum.Failure,
             message: `There was an error generating the PDFs. ${(pdf_gen_output as PDFGeneratedStatus).message}`,
+            generation_status: pdf_gen_output as PDFGeneratedStatus,
             output_plugins_status: [],
           });
         } else {
@@ -156,18 +165,35 @@ export default class DigitalCertificatesManager {
             },
           );
 
+          const certs_data_for_plugins = [certificates_data[0]];
+          const temp_paths: Array<string> = [];
+          for (let i = 0; i < pdf_gen_output.length; i++) {
+            if (pdf_gen_output[i].status === PDFGenerationStatusEnum.success) {
+              certs_data_for_plugins.push(certificates_data[i + 1]);
+              temp_paths.push(output_paths[i]);
+            }
+          }
+
           output_manager
             .generateOutput(
               plgs_configs,
-              temp_dir_abs_path,
-              certificates_data,
+              temp_paths,
+              certs_data_for_plugins,
               this.metadata,
             )
             .then((output_statuses) => {
               Promise.all(output_statuses).then((output_statuses) => {
+                // Delete the temporary directory and its contents
+                fs.rm(temp_dir_abs_path, { recursive: true, force: true }, (err) => {
+                  if (err) {
+                    console.error("Error deleting temporary directory:", err);
+                  }
+                });
+
                 resolve({
                   status: GenStatusEnum.Success,
                   message: "Certificates generated successfully.",
+                  generation_status: pdf_gen_output,
                   output_plugins_status: output_statuses,
                 });
               });

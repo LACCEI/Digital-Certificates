@@ -42,7 +42,11 @@ export interface PDFGenerationInterface {
    * @param output - The output file path for the generated PDF.
    * @see pdf_data
    **/
-  generate_pdf: (data: pdf_data, output: string) => Promise<PDFGeneratedStatus>;
+  generate_pdf: ( // FIXME: Fix comment.
+    data: pdf_data,
+    output: string,
+    strict_extra: boolean,
+  ) => Promise<PDFGeneratedStatus>;
 
   /**
    * Generates multiple PDFs with the provided data array and outputs them to
@@ -62,8 +66,10 @@ export interface PDFGenerationInterface {
    * @see pdf_data
    **/
   generate_pdfs: (
+    // FIXME: Fix comment.
     data: pdf_data[],
     output: string[],
+    strict_extra: boolean,
   ) => Promise<PDFGeneratedStatus | PDFGeneratedStatus[]>;
 }
 

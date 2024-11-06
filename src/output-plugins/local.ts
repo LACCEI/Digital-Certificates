@@ -32,7 +32,7 @@ const LocalPlugin: CertificatesOutputPlugin = {
 
   run(
     config: { [key: string]: any },
-    pdfs_temp_dir: string,
+    pdfs_temp_paths: Array<string>,
     certificates_data: CertificatesData,
     issue_metadata: IssueMetadataType,
   ): Promise<PluginOutputStatus> {
@@ -66,17 +66,13 @@ const LocalPlugin: CertificatesOutputPlugin = {
           if (use_col_filename) {
             filename = row[col_filename];
           } else {
-            filename = (index + 1).toString();
+            filename = (index + 1).toString() + ".pdf";
           }
 
-          const output_path: string = path.join(output_dir, filename + ".pdf");
-          const output_pdf_path: string = path.join(
-            pdfs_temp_dir,
-            filename + ".pdf",
-          );
+          const output_path: string = path.join(output_dir, filename);
 
           // Copy the PDF from the temporary directory to the output directory.
-          require("fs").copyFileSync(output_pdf_path, output_path);
+          require("fs").copyFileSync(pdfs_temp_paths[index], output_path);
         });
       } catch (error) {
         resolve({

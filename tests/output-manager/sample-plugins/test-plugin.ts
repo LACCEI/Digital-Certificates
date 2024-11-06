@@ -30,7 +30,7 @@ const TestPlugin: CertificatesOutputPlugin = {
 
   run(
     config: { [key: string]: any },
-    pdfs_temp_dir: string,
+    pdfs_temp_dir: Array<string>,
     certificates_data: CertificatesData,
     issue_metadata: IssueMetadataType,
   ): Promise<PluginOutputStatus> {

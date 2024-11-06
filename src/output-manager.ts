@@ -103,8 +103,9 @@ export interface CertificatesOutputPlugin {
    * certificates.
    **/
   run: (
+    // FIXME: Fix comment.
     config: { [key: string]: any },
-    pdfs_temp_dir: string,
+    pdfs_temp_paths: Array<string>,
     certificates_data: CertificatesData,
     issue_metadata: IssueMetadataType,
   ) => Promise<PluginOutputStatus>;
@@ -168,7 +169,7 @@ interface CertificatesOutputManagerInterface {
    **/
   generateOutput: (
     plugins: Array<PluginConfig>,
-    temp_dir: string,
+    temp_paths: Array<string>,
     certificates_data: CertificatesData,
     issue_metadata: IssueMetadataType,
   ) => Promise<Array<Promise<OutputStatus>>>;
@@ -192,13 +193,13 @@ class CertificatesOutputManager implements CertificatesOutputManagerInterface {
     if (fs.existsSync(dir)) {
       this.plugins_dir = dir;
     } else {
-      throw new Error("Directory does not exist.");
+      throw new Error(`Plugins directory does not exist. Path: ${dir}`);
     }
   }
 
   generateOutput(
     plugins: Array<PluginConfig>,
-    temp_dir: string,
+    temp_paths: Array<string>,
     certificates_data: CertificatesData,
     issue_metadata: IssueMetadataType,
   ): Promise<Array<Promise<OutputStatus>>> {
@@ -214,7 +215,7 @@ class CertificatesOutputManager implements CertificatesOutputManagerInterface {
           if (output_plugin) {
             let tmp = await output_plugin.run_plugin(
               plugin.config,
-              temp_dir,
+              temp_paths,
               certificates_data,
               issue_metadata,
             );

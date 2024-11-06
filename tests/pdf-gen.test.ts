@@ -126,6 +126,7 @@ describe("PDFGeneration - Working with one document", () => {
     const status: PDFGeneratedStatus = await pdfGen.generate_pdf(
       data,
       files.output,
+      true
     );
 
     expect(status.status).toEqual(PDFGenerationStatusEnum.extra_fields);
@@ -336,6 +337,8 @@ describe("PDFGeneration - Working with multiple documents", () => {
       ),
     };
 
+    files.output.push(`${dirs.output}/test-multiple-output-test2-extra.pdf`);
+
     const data: pdf_data[] = [
       ...multipleDataSample,
       [
@@ -347,7 +350,7 @@ describe("PDFGeneration - Working with multiple documents", () => {
     ];
 
     pdfGen.set_template(files.template);
-    const status = await pdfGen.generate_pdfs(data, files.output);
+    const status = await pdfGen.generate_pdfs(data, files.output, true);
 
     const expected_outputs = [
       PDFGenerationStatusEnum.success,
@@ -368,6 +371,53 @@ describe("PDFGeneration - Working with multiple documents", () => {
       });
     } else {
       fail("Expected an array of statuses of length 3.");
+    }
+  });
+
+  it("should generate PDF with extra fields", async () => {
+    const files = {
+      template: `${dirs.templates}/test-template1.docx`,
+      // expected: `${dirs.expected}/test-template1.pdf`,
+      output: multipleDataSample.map(
+        (_, i) => `${dirs.output}/test-multiple-output-test4-${i}.pdf`,
+      ),
+    };
+
+    files.output.push(`${dirs.output}/test-multiple-output-test4-extra.pdf`);
+
+    const data: pdf_data[] = [
+      ...multipleDataSample,
+      [
+        ["name", "John Doe"],
+        ["date", "2023-10-01"],
+        ["course", "Introduction to TypeScript"],
+        ["extra", "Extra field"],
+      ],
+    ];
+
+    pdfGen.set_template(files.template);
+    const status = await pdfGen.generate_pdfs(data, files.output);
+
+    const expected_outputs = [
+      PDFGenerationStatusEnum.success,
+      PDFGenerationStatusEnum.success,
+      PDFGenerationStatusEnum.success,
+    ];
+
+    const expected_messages = [
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
+      PDFGenerationStatusMessages[PDFGenerationStatusEnum.success],
+    ];
+
+    if (Array.isArray(status) && status.length === 3) {
+      status.forEach((s, i) => {
+        expect(s.message).toEqual(expected_messages[i]);
+        expect(s.status).toEqual(expected_outputs[i]);
+        // expect(compareFiles(files.output[i], files.expected)).toBeTruthy();
+      });
+    } else {
+      fail("Expected an array of statuses of length 2.");
     }
   });
 
@@ -400,7 +450,7 @@ describe("PDFGeneration - Working with multiple documents", () => {
         // expect(compareFiles(files.output[i], files.expected)).toBeTruthy();
       });
     } else {
-      fail("Expected an array of statuses of length 2.");
+      fail("Expected an array of statuses of length 2. Got: " + status);
     }
   });
 });

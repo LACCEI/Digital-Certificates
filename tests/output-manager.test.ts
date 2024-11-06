@@ -42,7 +42,7 @@ describe("CertificatesOutputManager", () => {
     const outputManager = new CertificatesOutputManager();
     expect(() => {
       outputManager.set_plugins_dir("/not-existing-dir");
-      outputManager.generateOutput([], "", [], get_sample_issue_metadata());
+      outputManager.generateOutput([], [], [], get_sample_issue_metadata());
     }).toThrow(Error);
   });
 
@@ -56,7 +56,7 @@ describe("CertificatesOutputManager", () => {
     outputManager.set_plugins_dir(empty_folder);
     const result = await outputManager.generateOutput(
       [],
-      "",
+      [],
       [],
       get_sample_issue_metadata(),
     );
@@ -74,7 +74,7 @@ describe("CertificatesOutputManager", () => {
           config: {},
         },
       ],
-      "",
+      [],
       [],
       get_sample_issue_metadata(),
     );
@@ -95,7 +95,7 @@ describe("CertificatesOutputManager", () => {
           config: {},
         },
       ],
-      "",
+      [],
       [],
       get_sample_issue_metadata(),
     );

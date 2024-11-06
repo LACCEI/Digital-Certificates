@@ -1,53 +1,120 @@
-/**
- * @file CLI for the Digital Certificates generation tool.
- **/
-
-/**
- * Entry point for the Digital Certificates generation tool when run as a standalone script.
- *
- * This script expects the following command-line arguments:
- * - `<recipients>`: Path to the recipients file.
- * - `<template_docx>`: Path to the DOCX template file.
- * - `<output_plugins>`: Comma-separated list of output plugins.
- * - `[tmp_folder]`: Optional temporary folder path.
- *
- * Usage:
- * ```sh
- * node digital-certificates-api.js <recipients> <template_docx> <output_plugins> [tmp_folder]
- * ```
- *
- * If the required arguments are not provided, the script will print a usage message and exit with an error code.
- *
- * The script initializes the `DigitalCertificatesAPI` and calls the `generate_certificates` method with the provided arguments.
- * It logs the status of the certificate generation process or any errors encountered.
- **/
-
 import DigitalCertificatesAPI from "./digital-certificates-api";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+import fs from "fs";
+import path from "path";
 
-if (require.main === module) {
-  const args = process.argv.slice(2);
-  if (args.length < 3) {
-    console.error(
-      "Usage: node digital-certificates-api.js <recipients> <template_docx> <output_plugins> [tmp_folder]",
-    );
-    process.exit(1);
+import {
+  output_plugins_data_type,
+  PDFGeneratedStatus,
+  PDFGenerationStatusEnum,
+} from "./pdf-gen-definitions";
+import {
+  GenerationStatus,
+  GenStatusEnum,
+} from "./digital-certificates-manager";
+import { PluginOutputStatus } from "./output-manager";
+
+async function main() {
+  const argv = yargs(hideBin(process.argv))
+    .option("recipients", {
+      alias: "r",
+      type: "string",
+      demandOption: true,
+      describe: "Path to the recipients file.",
+    })
+    .option("template", {
+      alias: "t",
+      type: "string",
+      demandOption: true,
+      describe: "Path to the template file.",
+    })
+    .option("output-config", {
+      alias: "o",
+      type: "string",
+      describe: "Path to the output plugins configuration file (JSON).",
+    })
+    .option("bunlde-metadata", {
+      alias: "b",
+      type: "string",
+      describe: "Path to the bundle metadata file (JSON).",
+    })
+    .option("temp-folder", {
+      alias: "f",
+      type: "string",
+      describe: "Path to the temporary folder.",
+    })
+    .help()
+    .alias("help", "h").argv;
+
+  const resolvedArgv = await argv;
+
+  const recipientsFile = resolvedArgv.recipients;
+  const templateFile = resolvedArgv.template;
+  const outputConfigFile = resolvedArgv.outputConfig;
+  const bundleMetadataFile = resolvedArgv.bundleMetadata;
+  const tempFolder = resolvedArgv.tempFolder || path.join(__dirname, "temp");
+
+  if (!fs.existsSync(tempFolder)) {
+    fs.mkdirSync(tempFolder, { recursive: true });
   }
 
-  const [recipients, template_docx, output_plugins, tmp_folder] = args;
-  const outputPluginsArray = output_plugins.split(",");
+  const recipients = path.resolve(recipientsFile);
+  const template = path.resolve(templateFile);
+  let outputConfig = {};
 
-  const api = new DigitalCertificatesAPI();
-  api
-    .generate_certificates(
+  let output_plugins: Array<string> = [];
+  if (outputConfigFile) {
+    outputConfig = JSON.parse(fs.readFileSync(outputConfigFile, "utf-8"));
+    output_plugins = Object.keys(outputConfig);
+  }
+
+  let bundle_metadata = {};
+  if (bundleMetadataFile) {
+    let bm_filepath = path.resolve(bundleMetadataFile as string);
+    bundle_metadata = JSON.parse(fs.readFileSync(bm_filepath, "utf-8"));
+  }
+
+  const digitalCertificatesAPI = new DigitalCertificatesAPI();
+  const output_status: GenerationStatus =
+    await digitalCertificatesAPI.generate_certificates(
       recipients,
-      template_docx,
-      outputPluginsArray,
-      tmp_folder,
-    )
-    .then((status) => {
-      console.log("Certificates generated successfully:", status);
-    })
-    .catch((error) => {
-      console.error("Error generating certificates:", error);
-    });
+      template,
+      output_plugins,
+      outputConfig as output_plugins_data_type,
+      bundle_metadata,
+      tempFolder,
+    );
+
+  console.log(output_status.message);
+
+  if (output_status.status !== GenStatusEnum.Success) {
+    for (
+      let i = 0;
+      i < (output_status.generation_status as Array<PDFGeneratedStatus>).length;
+      i++
+    ) {
+      const gen_status = (
+        output_status.generation_status as Array<PDFGeneratedStatus>
+      )[i];
+      if (gen_status.status !== PDFGenerationStatusEnum.success) {
+        console.log(`PDF ${i + 1}: ${gen_status.message}`);
+      }
+    }
+  }
+
+  for (let i = 0; i < output_status.output_plugins_status.length; i++) {
+    const output_plugin: PluginOutputStatus =
+      output_status.output_plugins_status[i];
+    const output_plugin_name = output_plugins[i];
+    const output_plugin_message = output_plugin.message;
+
+    console.log(
+      `Output plugin ${output_plugin_name}: ${output_plugin_message}`,
+    );
+  }
+}
+
+if (require.main === module) {
+  main();
 }

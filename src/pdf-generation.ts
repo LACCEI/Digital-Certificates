@@ -117,6 +117,7 @@ export default class PDFGeneration implements PDFGenerationInterface {
   async generate_pdf(
     instance_data: pdf_data,
     output: string,
+    strict_extra: boolean = false,
   ): Promise<PDFGeneratedStatus> {
     const template_status = this.should_fail_due_to_template();
     if (template_status) {
@@ -127,20 +128,23 @@ export default class PDFGeneration implements PDFGenerationInterface {
 
     const placeholders = await this.list_placeholders(template_buffer);
     const model = this.build_model(instance_data);
-
     if (this.is_missing_placeholders(placeholders, model)) {
       return {
         status: PDFGenerationStatusEnum.missing_fields,
         message:
           PDFGenerationStatusMessages[PDFGenerationStatusEnum.missing_fields],
       };
-    } else if (this.has_extra_placeholders(placeholders, model)) {
+    } else if (
+      strict_extra &&
+      this.has_extra_placeholders(placeholders, model)
+    ) {
       return {
         status: PDFGenerationStatusEnum.extra_fields,
         message:
           PDFGenerationStatusMessages[PDFGenerationStatusEnum.extra_fields],
       };
     }
+
 
     try {
       const docxBuffer = await createReport({
@@ -171,16 +175,20 @@ export default class PDFGeneration implements PDFGenerationInterface {
   generate_pdfs(
     data: pdf_data[],
     output: string[],
+    strict_extra: boolean = false,
   ): Promise<PDFGeneratedStatus | PDFGeneratedStatus[]> {
-    const template_status = this.should_fail_due_to_template();
-    if (template_status) {
-      return Promise.resolve(template_status as PDFGeneratedStatus);
-    }
-
-    const promises = data.map((instance_data, index) => {
-      return this.generate_pdf(instance_data, output[index]);
+    return new Promise(async (resolve) => {
+      const template_status = this.should_fail_due_to_template();
+      if (template_status) {
+        resolve(template_status as PDFGeneratedStatus);
+      }
+      
+      const results: PDFGeneratedStatus[] = [];
+      for (let i = 0; i < data.length; i++) {
+        results.push(await this.generate_pdf(data[i], output[i], strict_extra));
+      }
+      
+      resolve(results);
     });
-
-    return Promise.all(promises);
   }
 }
