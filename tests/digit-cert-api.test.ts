@@ -41,7 +41,9 @@ describe("DigitalCertificatesAPI", () => {
         simple_csv_file_path,
         template_filepath,
         [],
-        tmp_folder
+        {},
+        {},
+        tmp_folder,
       );
 
       const generate_certificatesMock = (
@@ -95,7 +97,9 @@ describe("load Excel files", () => {
       simple_excel_file_path,
       template_filepath,
       [],
-      tmp_folder
+      {},
+      {},
+      tmp_folder,
     );
 
     const generate_certificatesMock = (

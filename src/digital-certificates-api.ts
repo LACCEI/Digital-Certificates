@@ -45,9 +45,9 @@ interface DigitalCertificatesAPIInterface {
     recipients: string,
     template_docx: string,
     output_plugins: Array<string>,
-    tmp_folder: string,
     output_plugins_data: output_plugins_data_type,
     bundle_metadata: any,
+    tmp_folder: string,
   ) => Promise<GenerationStatus>; // FIXME: What should it resolve to?
 }
 
@@ -58,9 +58,9 @@ export default class DigitalCertificatesAPI
     recipients: string,
     template_docx: string,
     output_plugins: Array<string>,
-    tmp_folder: string = "./tmp",
     output_plugins_data: output_plugins_data_type = {},
     bundle_metadata: any = {},
+    tmp_folder: string = "./tmp",
   ): Promise<GenerationStatus> {
     return new Promise((resolve, reject) => {
       if (!path.isAbsolute(recipients)) {
