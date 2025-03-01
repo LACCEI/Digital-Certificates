@@ -12,6 +12,11 @@ Digital Certificates Service is a versatile tool designed to automate the creati
 - NodeJS
 - NPM
 
+You can use `nvm` to install the specific version of node and npm compatible with this project.
+```
+nvm use
+```
+
 Then, install the dependencies.
 ```
 npm install
